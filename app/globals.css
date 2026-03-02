@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+/* 1. Jika Antigravity Anda berupa plugin npm, panggil seperti ini: */
+/* @plugin "tailwindcss-antigravity"; */
+
+/* 2. Jika Antigravity Anda berupa custom utility, masukkan di sini */
+@theme {
+  /* Contoh menambahkan durasi atau efek custom antigravity ke theme v4 */
+  --animate-float: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* --- SETELAN DASAR --- */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", sans-serif;
+  @apply antialiased; /* Menggunakan fitur Antigravity (smoothing) bawaan Tailwind */
+}
+
+/* --- ANIMASI PROGRESS BAR LOGIN --- */
+@keyframes progress-bar {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+.animate-progress-bar {
+  animation: progress-bar 1.5s ease-in-out infinite;
+}
+
+/* Sisa kode animasi Anda (ping, custom-marker, print) tetap sama di bawah */
