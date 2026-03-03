@@ -38,9 +38,10 @@ app.add_middleware(
 # ==========================================
 # 3. KONEKSI CLIENTS
 # ==========================================
+# Variabel sekarang SINKRON dengan .env Anda
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_ANON_KEY") 
+SUPABASE_URL = os.getenv("NEXT_PUBLIC_SUPABASE_URL")
+SUPABASE_KEY = os.getenv("NEXT_PUBLIC_SUPABASE_ANON_KEY") 
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
 
 # --- Init Groq ---
