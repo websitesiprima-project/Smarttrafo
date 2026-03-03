@@ -72,7 +72,29 @@ if VITE_SUPABASE_URL and SUPABASE_SERVICE_KEY:
         print(f"❌ Supabase Admin Error: {e}")
 
 # ==========================================
-# 4. INIT MODEL ML
+# 4. INIT AGENT MD (SYSTEM PROMPT)
+# ==========================================
+def load_agent_prompt():
+    """Fungsi untuk membaca identitas dan guardrails Volty dari file agent.md"""
+    try:
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        path = os.path.join(current_dir, "agent.md")
+        with open(path, "r", encoding="utf-8") as f:
+            prompt = f.read()
+            print("✅ Agent MD (System Prompt) Loaded")
+            return prompt
+    except Exception as e:
+        print(f"⚠️ Warning: agent.md tidak ditemukan! Menggunakan prompt darurat. Error: {e}")
+        return """Anda adalah VOLTY, Spesialis Senior Transformator PLN UPT Manado.
+BATASAN KETAT:
+1. HANYA jawab pertanyaan seputar Transformator dan Listrik Tegangan Tinggi.
+2. Jika ditanya hal lain, TOLAK dengan Kalimat, "Saya tidak dapat membantu anda. Saya hanya diprogram untuk urusan teknis transformator."
+"""
+
+VOLTY_BASE_PROMPT = load_agent_prompt()
+
+# ==========================================
+# 5. INIT MODEL ML
 # ==========================================
 model_trafo = None
 try:
@@ -89,9 +111,8 @@ except Exception as e:
     print(f"❌ ERROR LOADING MODEL: {str(e)}")
     print("⚠️ System running without ML prediction.")
 
-
 # ==========================================
-# 5. DATA MODELS
+# 6. DATA MODELS
 # ==========================================
 class TrafoInput(BaseModel):
     no_dokumen: str = "-"
@@ -172,7 +193,7 @@ class UpdateUltgInput(BaseModel):
     requester_email: str
 
 # ==========================================
-# 6. METODE ANALISIS TEKNIS
+# 7. METODE ANALISIS TEKNIS
 # ==========================================
 
 def hitung_tdcg(data: TrafoInput):
@@ -358,8 +379,6 @@ def analisis_ratio_co2_co(data: TrafoInput):
         
     return status, ratio
 
-# NOTE: Fungsi analisis_duval_triangle_1 telah DIHAPUS.
-
 def analisis_ieee_2019(data: TrafoInput):
     LIMITS_COND1 = {'h2': 100, 'ch4': 120, 'c2h6': 65, 'c2h4': 50, 'c2h2': 1, 'co': 350}
     LIMITS_COND2 = {'h2': 200, 'ch4': 400, 'c2h6': 100, 'c2h4': 100, 'c2h2': 2, 'co': 570}
@@ -473,13 +492,12 @@ def analisis_key_gas(data: TrafoInput):
         "Corona (H2)": float(data.h2),
         "Arcing (C2H2)": float(data.c2h2)
     }
-    # PYLANCE FIX: Cast to Any to satisfy 'max' type checker
     dominant_gas = max(gases, key=cast(Any, gases.get))
     if gases[dominant_gas] == 0: return "Tidak Ada Gas Dominan"
     return f"Dominan {dominant_gas}"
 
 # ==========================================
-# 7. ENDPOINTS (API ROUTES)
+# 8. ENDPOINTS (API ROUTES)
 # ==========================================
 
 # --- 1. TAMBAH TRAFO (SUPER ADMIN) ---
@@ -538,17 +556,13 @@ def predict(data: TrafoInput):
             print(f"ML Predict Error: {e}")
             ml_res = "Error Prediction"
 
-    # C. Analisis AI (LLM - Groq)
+    # C. Analisis AI (LLM - Groq) menggunakan Agent MD
     volty_chat = "-"
     if groq_client and not data.skip_ai:
-        system_prompt = """Anda adalah VOLTY, Spesialis Senior Analisis DGA (Dissolved Gas Analysis) Transformator untuk PLN UPT Manado.
-
-TUGAS: Menyusun laporan kesimpulan analisis DGA transformator berdasarkan hasil analisis yang sudah dihitung.
-
-STANDAR ACUAN (3 metode yang digunakan):
-1. IEEE C57.104-2019 - Standar internasional untuk interpretasi DGA
-2. SPLN T5.004-4:2016 - Standar PLN Indonesia berdasarkan nilai TDCG
-3. Duval Pentagon 1 - Metode lokalisasi jenis fault
+        # Panggil VOLTY_BASE_PROMPT dan tambahkan instruksi pembuatan laporan
+        system_prompt = VOLTY_BASE_PROMPT + """
+        
+TUGAS KHUSUS SAAT INI: Susun laporan kesimpulan analisis DGA transformator berdasarkan hasil analisis yang sudah dihitung.
 
 ATURAN PENTING:
 - GUNAKAN hasil analisis yang sudah diberikan, JANGAN menganalisis ulang
@@ -571,7 +585,6 @@ FORMAT OUTPUT (Markdown, TANPA emoji):
 [Tindakan pemeliharaan/monitoring yang perlu dilakukan]
 """
         
-        # Pylance Fix: Safely get values from dictionary
         zona_p = str(pentagon_pct.get('zona', '-'))
         h2_p = float(cast(float, pentagon_pct.get('h2',0)))
         c2h6_p = float(cast(float, pentagon_pct.get('c2h6',0)))
@@ -659,23 +672,14 @@ INSTRUKSI: Susun laporan kesimpulan singkat dan rekomendasi."""
         "volty_chat": volty_chat
     }
 
-# --- 3. CHATBOT ---
-# --- INI ADALAH AGENT MD (SYSTEM PROMPT) ---
-VOLTY_SYSTEM_PROMPT = """
-Anda adalah VOLTY, Spesialis Senior Transformator PLN UPT Manado.
-TUGAS: Menganalisis data DGA dan memberikan solusi teknis pemeliharaan trafo.
-
-BATASAN KETAT:
-1. HANYA jawab pertanyaan seputar Transformator, Listrik Tegangan Tinggi, dan fitur aplikasi ini.
-2. Jika ditanya hal lain (bola, masak, politik, dll), TOLAK dengan sopan.
-3. Gunakan bahasa profesional PLN.
-"""
-
+# --- 3. CHATBOT DENGAN AGENT MD ---
 @app.post("/chat")
 def chat_with_volty(data: ChatInput):
     if not groq_client: return {"reply": "Maaf, koneksi AI sedang offline."}
     
-    system_msg = VOLTY_SYSTEM_PROMPT
+    # Gunakan identitas dan guardrails yang dibaca dari agent.md
+    system_msg = VOLTY_BASE_PROMPT
+    
     if data.context:
         system_msg += f"\n\nKONTEKS DATA TRAFO:\n{data.context}"
         
@@ -686,7 +690,8 @@ def chat_with_volty(data: ChatInput):
                 {"role": "user", "content": data.message}
             ],
             model="llama-3.3-70b-versatile",
-            max_tokens=600
+            max_tokens=600,
+            temperature=0.1 # Suhu rendah (0.1) agar AI patuh pada aturan penolakan agent.md
         )
         return {"reply": chat.choices[0].message.content}
     except Exception as e:
