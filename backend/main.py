@@ -21,9 +21,10 @@ app = FastAPI(title="Volty AI Backend - Ultimate Version")
 # 2. KEAMANAN CORS
 # ==========================================
 origins = [
-    "http://localhost:3000",       # Port default Next.js
+    "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "https://volty-frontend.vercel.app" # URL Production Anda
+    "https://volty-frontend.vercel.app",
+    "https://smarttrafo.plnuptmdo.com"  # Wajib ditambahkan agar Hostinger tidak diblokir
 ]
 
 app.add_middleware(
@@ -38,8 +39,8 @@ app.add_middleware(
 # 3. KONEKSI CLIENTS
 # ==========================================
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-VITE_SUPABASE_URL = os.getenv("NEXT_PUBLIC_SUPABASE_URL") or os.getenv("SUPABASE_URL")
-VITE_SUPABASE_KEY = os.getenv("NEXT_PUBLIC_SUPABASE_ANON_KEY") or os.getenv("SUPABASE_KEY")
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_ANON_KEY") 
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
 
 # --- Init Groq ---
@@ -54,9 +55,9 @@ if GROQ_API_KEY:
 # --- Init Supabase (Client Biasa) ---
 supabase: Optional[Client] = None
 db_active = False
-if VITE_SUPABASE_URL and VITE_SUPABASE_KEY:
+if SUPABASE_URL and SUPABASE_KEY:
     try:
-        supabase = create_client(VITE_SUPABASE_URL, VITE_SUPABASE_KEY)
+        supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
         db_active = True
         print("✅ Supabase Client Connected")
     except Exception as e:
@@ -64,13 +65,12 @@ if VITE_SUPABASE_URL and VITE_SUPABASE_KEY:
 
 # --- Init Supabase Admin (Service Role) ---
 supabase_admin: Optional[Client] = None
-if VITE_SUPABASE_URL and SUPABASE_SERVICE_KEY:
+if SUPABASE_URL and SUPABASE_SERVICE_KEY:
     try:
-        supabase_admin = create_client(VITE_SUPABASE_URL, SUPABASE_SERVICE_KEY)
+        supabase_admin = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
         print("✅ Supabase Admin (Service Role) Connected")
     except Exception as e:
         print(f"❌ Supabase Admin Error: {e}")
-
 # ==========================================
 # 4. INIT AGENT MD (SYSTEM PROMPT)
 # ==========================================
