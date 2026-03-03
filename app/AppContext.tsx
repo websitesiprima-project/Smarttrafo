@@ -27,8 +27,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [liveData, setLiveData] = useState<any[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
 
-  const API_URL = "http://127.0.0.1:8000";
-
+  const API_URL: string = process.env.NEXT_PUBLIC_API_URL!;
   // --- Theme ---
   useEffect(() => {
     const saved = localStorage.getItem("pln-smart-trafo-darkmode");

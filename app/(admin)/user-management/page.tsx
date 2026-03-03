@@ -23,7 +23,7 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/supabaseClient";
 
 // URL API Backend
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // ============================================================================
 // INTERFACES (KAMUS TYPE SCRIPT)

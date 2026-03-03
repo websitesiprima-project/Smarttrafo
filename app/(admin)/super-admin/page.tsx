@@ -24,7 +24,7 @@ import {
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabaseClient";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // ============================================================================
 // INTERFACES (KAMUS TYPE SCRIPT)
