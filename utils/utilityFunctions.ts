@@ -32,6 +32,7 @@ export const parseInteger = (value) => {
 
 // --- 4. DATE VALIDATOR ---
 export const isValidDate = (dateString) => {
+  if (!dateString) return false;
   const date = new Date(dateString);
   return date instanceof Date && !isNaN(date);
 };
