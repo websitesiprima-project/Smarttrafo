@@ -4,26 +4,38 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Zap, Database, ShieldCheck, Map as MapIcon } from "lucide-react";
+import {
+  Zap,
+  Database,
+  ShieldCheck,
+  Map as MapIcon,
+  Activity,
+} from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 
-// --- KONFIGURASI GAMBAR (Asset harus ada di folder /public/assets/) ---
-const HERO_IMAGE_SOURCE = "/assets/Trafo_1.webp";
-const LAB_IMAGE_SOURCE = "/assets/Lab.webp";
+// --- KONFIGURASI GAMBAR ---
+const HERO_IMAGE_SOURCE =
+  "https://images.unsplash.com/photo-1548337138-e87d889cc369?q=80&w=2070&auto=format&fit=crop";
+const LAB_IMAGE_SOURCE =
+  "https://images.unsplash.com/photo-1581093450021-4a7360e9a6b5?q=80&w=2070&auto=format&fit=crop";
 const LOGO_SMART = "/assets/Logo_SMART.jpg";
 
-// --- LOGO TECH STACK ---
-const LOGO_REACT = "/assets/React.webp";
-const LOGO_VITE = "/assets/Logo_Vite.webp";
-const LOGO_TAILWIND = "/assets/Tailwind_CSS.png";
-const LOGO_POSTGRES = "/assets/Postgresql.png";
-const LOGO_RECHARTS = "/assets/Rechart.png";
-const LOGO_LEAFLET = "/assets/Leaflet.png";
-const LOGO_SUPABASE = "/assets/supabase.png";
+// --- LOGO TECH STACK (SVG CDN untuk Kualitas HD) ---
+const LOGO_NEXTJS =
+  "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nextjs/nextjs-original.svg";
+const LOGO_TAILWIND =
+  "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg";
+const LOGO_SUPABASE =
+  "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/supabase/supabase-original.svg";
+const LOGO_POSTGRES =
+  "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg";
+const LOGO_PYTHON =
+  "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg"; // ADDED
+const LOGO_FASTAPI =
+  "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/fastapi/fastapi-original.svg"; // ADDED
 
 export default function LandingPage() {
   const router = useRouter();
-
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
@@ -42,446 +54,506 @@ export default function LandingPage() {
     }
   };
 
-  const onStart = () => {
-    router.push("/login"); // Navigasi ke Dashboard/Login
-  };
-
-  const onGuide = () => {
-    router.push("/guide"); // Navigasi ke Panduan
-  };
+  const onStart = () => router.push("/login");
+  const onGuide = () => router.push("/login");
 
   const primaryColor = "text-[#1B7A8F]";
   const bgPrimary = "bg-[#1B7A8F]";
-  const btnGreen = "bg-[#1B7A8F] hover:bg-[#16697a]";
+  const btnGreen =
+    "bg-linear-to-r from-[#1B7A8F] to-[#156b7d] hover:from-[#156b7d] hover:to-[#0f4d5a]";
 
   return (
     <div
-      className={`min-h-screen font-sans transition-colors duration-500 ${
-        isDarkMode ? "bg-[#0f172a] text-white" : "bg-white text-slate-800"
-      }`}
+      className={`min-h-screen font-sans transition-colors duration-500 overflow-hidden ${isDarkMode ? "bg-[#0f172a] text-white" : "bg-slate-50 text-slate-800"}`}
     >
+      {/* CSS KHUSUS UNTUK ANIMASI MARQUEE SEAMLESS */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-100%); }
+        }
+        .animate-marquee-track {
+          display: flex;
+          width: 100%;
+          overflow: hidden;
+        }
+        .animate-marquee-content {
+          display: flex;
+          flex-shrink: 0;
+          min-width: 100%;
+          justify-content: space-around;
+          animation: marquee 25s linear infinite;
+        }
+        .animate-marquee-track:hover .animate-marquee-content {
+          animation-play-state: paused;
+        }
+      `,
+        }}
+      />
+
       {/* NAVBAR */}
       <nav
-        className={`container mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5 flex justify-between items-center z-20 sticky top-0 backdrop-blur-sm ${
-          isDarkMode ? "bg-[#0f172a]/90" : "bg-white/90"
-        }`}
+        className={`container mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex justify-between items-center z-50 sticky top-0 backdrop-blur-md border-b ${isDarkMode ? "bg-[#0f172a]/80 border-slate-800" : "bg-white/80 border-slate-200"}`}
       >
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div
+          className="flex items-center gap-2 sm:gap-3 cursor-pointer"
+          onClick={() => window.scrollTo(0, 0)}
+        >
           <Image
             src="https://upload.wikimedia.org/wikipedia/commons/2/20/Logo_PLN.svg"
             alt="Logo PLN"
             width={80}
             height={40}
-            className="w-12 h-6 sm:w-16 sm:h-8 lg:w-20 lg:h-10 object-contain"
+            className="w-12 h-6 sm:w-16 sm:h-8 object-contain"
             priority
           />
-          <div className="h-5 sm:h-6 lg:h-8 w-px bg-gray-300 mx-0.5 sm:mx-1 opacity-50"></div>
-          <div className="flex items-center gap-1 sm:gap-2">
-            <Image
-              src={LOGO_SMART}
-              alt="Logo SMART"
-              width={40}
-              height={40}
-              className="w-7 h-7 sm:w-9 sm:h-9 lg:w-10 lg:h-10 object-contain rounded-md mix-blend-multiply"
-            />
+          <div className="h-6 sm:h-8 w-px bg-gray-300 mx-1 opacity-50"></div>
+
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* PERBAIKAN LOGO SMART: Dibungkus container putih ala "App Icon" Apple/Modern */}
+            <div className="bg-white p-1 sm:p-1.5 rounded-lg sm:rounded-xl shadow-sm border border-slate-200 flex items-center justify-center overflow-hidden">
+              <Image
+                src={LOGO_SMART}
+                alt="Logo SMART"
+                width={40}
+                height={40}
+                className="w-6 h-6 sm:w-8 sm:h-8 object-contain"
+                // Hapus mix-blend-multiply agar warna asli logonya keluar dan tajam
+              />
+            </div>
             <h1
-              className={`text-sm sm:text-lg lg:text-xl font-bold tracking-tight ${
-                isDarkMode ? "text-white" : "text-[#1B7A8F]"
-              }`}
+              className={`text-base sm:text-xl font-extrabold tracking-tight ${isDarkMode ? "text-white" : "text-[#1B7A8F]"}`}
             >
               PLN <span className="text-[#F1C40F]">SMART</span>
             </h1>
           </div>
         </div>
 
-        <div className="hidden md:flex gap-6 lg:gap-8 text-sm font-medium opacity-80">
-          <Link href="#" className="hover:text-[#1B7A8F] transition">
+        <div className="hidden md:flex gap-8 text-sm font-semibold text-slate-500 dark:text-slate-400">
+          <Link
+            href="#"
+            className="hover:text-[#1B7A8F] dark:hover:text-[#F1C40F] transition-colors"
+          >
             Beranda
           </Link>
-          <a href="#features" className="hover:text-[#1B7A8F] transition">
+          <a
+            href="#features"
+            className="hover:text-[#1B7A8F] dark:hover:text-[#F1C40F] transition-colors"
+          >
             Fitur
           </a>
-          <a href="#tech" className="hover:text-[#1B7A8F] transition">
+          <a
+            href="#tech"
+            className="hover:text-[#1B7A8F] dark:hover:text-[#F1C40F] transition-colors"
+          >
             Teknologi
           </a>
-          <a href="#about" className="hover:text-[#1B7A8F] transition">
-            Tentang Kami
+          <a
+            href="#about"
+            className="hover:text-[#1B7A8F] dark:hover:text-[#F1C40F] transition-colors"
+          >
+            Tentang
           </a>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-3">
           <button
             onClick={onStart}
-            aria-label="Login ke Dashboard"
-            className={`px-3 py-2 sm:px-4 sm:py-2.5 lg:px-5 lg:py-3 rounded shadow-lg hover:-translate-y-0.5 transition-all text-white font-bold text-xs sm:text-sm ${btnGreen}`}
+            className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all text-white font-bold text-xs sm:text-sm ${btnGreen}`}
           >
-            <span className="hidden sm:inline">Login Sekarang</span>
-            <span className="sm:hidden">Login</span>
+            Login <span className="hidden sm:inline">Sekarang</span>
           </button>
-          <div className="flex items-center justify-center h-9 sm:h-10 scale-75 sm:scale-90 -mt-5">
+          <div className="scale-90 flex items-center justify-center -mt-5">
             <ThemeToggle isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
           </div>
         </div>
       </nav>
 
-      {/* MAIN CONTENT */}
-      <main>
+      <main className="relative">
+        {/* EFEK GLOWING BACKGROUND (Subtle Blobs) */}
+        <div className="absolute top-20 left-0 w-[500px] h-[500px] bg-[#1B7A8F]/20 rounded-full filter blur-[100px] opacity-60 pointer-events-none dark:bg-[#1B7A8F]/10"></div>
+        <div className="absolute top-40 right-0 w-[400px] h-[400px] bg-[#F1C40F]/15 rounded-full filter blur-[100px] opacity-60 pointer-events-none dark:bg-[#F1C40F]/10"></div>
+
         {/* HERO SECTION */}
-        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 md:py-16 lg:py-20 flex flex-col-reverse md:flex-row items-center gap-6 sm:gap-8 lg:gap-12">
-          <div className="flex-1 space-y-3 sm:space-y-4 lg:space-y-6 animate-in slide-in-from-left-10 duration-700">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold leading-tight">
+        <section className="container relative mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-24 flex flex-col-reverse md:flex-row items-center gap-10 lg:gap-16 z-10">
+          <div className="flex-1 space-y-5 lg:space-y-7 animate-in slide-in-from-left-10 duration-700">
+            <div className="inline-block px-4 py-1.5 rounded-full bg-blue-100/50 text-[#1B7A8F] font-semibold text-xs sm:text-sm border border-blue-200 dark:bg-slate-800 dark:text-blue-400 dark:border-slate-700 backdrop-blur-sm mb-2">
+              ✨ Sistem Berbasis Machine Learning
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold leading-[1.15]">
               Transformasi Digital <br />
-              <span className={`${primaryColor}`}>
+              {/* GRADIENT TEXT */}
+              <span className="bg-clip-text text-transparent bg-linear-to-r from-[#1B7A8F] to-[#2ecc71] drop-shadow-sm">
                 Monitoring Aset Transmisi
               </span>
             </h2>
             <p
-              className={`text-sm sm:text-base lg:text-lg leading-relaxed max-w-lg ${
-                isDarkMode ? "text-slate-400" : "text-slate-600"
-              }`}
+              className={`text-sm sm:text-base lg:text-lg leading-relaxed max-w-lg ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}
             >
-              Platform monitoring kesehatan transformator berbasis{" "}
+              Platform monitoring kesehatan transformator menggunakan{" "}
               <strong>Artificial Intelligence</strong> dan Standar{" "}
               <strong>IEEE C57.104</strong> untuk analisis DGA yang akurat,
-              cepat, dan <em>real-time</em>.
+              terpusat, dan <em>real-time</em>.
             </p>
-            <div className="flex gap-3 sm:gap-4 pt-2">
+            <div className="flex gap-4 pt-4">
               <button
                 onClick={onStart}
-                className={`px-5 py-2.5 sm:px-6 sm:py-3 lg:px-8 lg:py-3.5 rounded text-white font-bold text-sm sm:text-base shadow-xl transition-transform active:scale-95 ${bgPrimary} hover:bg-[#156b7d]`}
+                className={`px-6 py-3 lg:px-8 lg:py-4 rounded-xl text-white font-bold text-sm sm:text-base shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all ${btnGreen}`}
               >
                 Mulai Analisis
+              </button>
+              <button
+                onClick={onGuide}
+                className={`px-6 py-3 lg:px-8 lg:py-4 rounded-xl font-bold text-sm sm:text-base shadow-sm border transition-all hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800 ${isDarkMode ? "text-slate-300" : "text-slate-700"}`}
+              >
+                Lihat Panduan
               </button>
             </div>
           </div>
 
-          {/* Hero Image - LCP Optimized with fetchPriority */}
-          <div className="flex-1 w-full relative animate-in slide-in-from-right-10 duration-700 h-56 sm:h-72 md:h-80 lg:h-96 xl:h-[500px] overflow-hidden rounded-xl sm:rounded-2xl shadow-xl">
-            <Image
-              src={HERO_IMAGE_SOURCE}
-              alt="Ilustrasi Petugas PLN & Digital Dashboard"
-              fill
-              className="object-cover transition-transform duration-700 hover:scale-105"
-              style={{ objectPosition: "center" }}
-              fetchPriority="high"
-            />
-          </div>
-        </section>
-
-        {/* TECH STACK */}
-        <section
-          id="tech"
-          className={`py-8 sm:py-12 lg:py-16 ${isDarkMode ? "bg-slate-900" : "bg-slate-50"}`}
-        >
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-5 sm:space-y-8 lg:space-y-10">
-            <div>
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold">
-                Powered by Modern Technology
-              </h3>
-              <p
-                className={`mt-2 text-xs sm:text-sm ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}
-              >
-                Dibangun dengan ekosistem teknologi terkini untuk performa
-                tinggi & skalabilitas.
-              </p>
+          {/* HERO IMAGE DENGAN FLOATING BADGES */}
+          <div className="flex-1 w-full relative animate-in slide-in-from-right-10 duration-1000">
+            <div className="relative w-full h-64 sm:h-80 md:h-96 lg:h-[480px] rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-800 z-10">
+              <Image
+                src={HERO_IMAGE_SOURCE}
+                alt="Digital Dashboard"
+                fill
+                className="object-cover transition-transform duration-1000 hover:scale-105"
+                priority
+              />
+              <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent pointer-events-none"></div>
             </div>
 
-            <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-10 md:gap-16 opacity-80 hover:opacity-100 transition-all duration-500">
-              {/* React */}
-              <div className="flex flex-col items-center gap-3 w-20 group">
-                <div className="h-14 w-14 flex items-center justify-center bg-white rounded-xl shadow-sm p-3 group-hover:-translate-y-1 transition-transform">
-                  <Image
-                    src={LOGO_REACT}
-                    alt="React"
-                    width={56}
-                    height={56}
-                    className="h-full w-full object-contain animate-spin-slow"
-                  />
-                </div>
-                <span className="font-bold text-xs text-slate-500">React</span>
+            {/* Floating Badge 1 - Kiri Bawah */}
+            <div
+              className={`absolute -bottom-6 -left-4 sm:-left-8 px-4 py-3 rounded-2xl shadow-xl border flex items-center gap-3 z-20 animate-bounce ${isDarkMode ? "bg-slate-800 border-slate-700" : "bg-white border-slate-100"} [animation-duration:3s]`}
+            >
+              <div className="bg-green-100 text-green-600 p-2.5 rounded-full">
+                <ShieldCheck size={20} />
               </div>
-
-              {/* Vite - Perbaikan: Tetap disertakan sesuai file asli */}
-              <div className="flex flex-col items-center gap-3 w-20 group">
-                <div className="h-14 w-14 flex items-center justify-center bg-white rounded-xl shadow-sm p-2 group-hover:-translate-y-1 transition-transform">
-                  <Image
-                    src={LOGO_VITE}
-                    alt="Vite"
-                    width={56}
-                    height={56}
-                    className="h-full w-full object-contain"
-                  />
-                </div>
-                <span className="font-bold text-xs text-slate-500">Vite</span>
+              <div>
+                <p className="text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider font-bold">
+                  Akurasi AI DGA
+                </p>
+                <p
+                  className={`font-extrabold text-sm sm:text-base ${isDarkMode ? "text-white" : "text-slate-800"}`}
+                >
+                  Tingkat Presisi Tinggi
+                </p>
               </div>
+            </div>
 
-              {/* Tailwind - Menggunakan shrink-0 (v4 compatible) */}
-              <div className="flex flex-col items-center gap-3 w-32 group shrink-0">
-                <div className="h-14 w-auto px-4 flex items-center justify-center bg-white rounded-xl shadow-sm group-hover:-translate-y-1 transition-transform">
+            {/* Floating Badge 2 - Kanan Atas */}
+            <div
+              className={`absolute top-8 -right-4 sm:-right-8 px-4 py-3 rounded-2xl shadow-xl border flex items-center gap-3 z-20 ${isDarkMode ? "bg-slate-800 border-slate-700" : "bg-white border-slate-100"}`}
+            >
+              <div className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+              </div>
+              <p
+                className={`font-bold text-xs sm:text-sm ${isDarkMode ? "text-white" : "text-slate-800"}`}
+              >
+                Live Data Sync
+              </p>
+            </div>
+          </div>
+        </section>
+        {/* TECH STACK MARQUEE (100% Seamless Infinite Loop) */}
+        <section
+          id="tech"
+          className={`relative py-12 border-y ${isDarkMode ? "bg-slate-900/50 border-slate-800" : "bg-white border-slate-100"}`}
+        >
+          <div className="container mx-auto px-4 text-center mb-8">
+            <p className="text-sm font-bold tracking-widest uppercase text-slate-400">
+              Dibangun dengan Ekosistem Teknologi Modern
+            </p>
+          </div>
+
+          <div className="relative w-full">
+            {/* Gradient Masking untuk efek pudar di pinggir (Kiri & Kanan) */}
+            <div
+              className={`absolute left-0 top-0 w-16 sm:w-32 h-full z-10 pointer-events-none bg-linear-to-r ${isDarkMode ? "from-[#0f172a] to-transparent" : "from-slate-50 to-transparent"}`}
+            ></div>
+            <div
+              className={`absolute right-0 top-0 w-16 sm:w-32 h-full z-10 pointer-events-none bg-linear-to-l ${isDarkMode ? "from-[#0f172a] to-transparent" : "from-slate-50 to-transparent"}`}
+            ></div>
+
+            {/* Kontainer Utama Marquee */}
+            <div className="animate-marquee-track">
+              {/* Diulang 3 kali agar cukup menutupi layar monitor lebar */}
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className="animate-marquee-content gap-12 sm:gap-20 pr-12 sm:pr-20"
+                  aria-hidden={i > 0 ? "true" : "false"}
+                >
+                  <Image
+                    src={LOGO_NEXTJS}
+                    alt="Next.js"
+                    width={50}
+                    height={50}
+                    className={`h-10 sm:h-12 w-auto object-contain ${isDarkMode && "filter invert opacity-80"}`}
+                  />
+                  {/* ADDED: Python */}
+                  <Image
+                    src={LOGO_PYTHON}
+                    alt="Python"
+                    width={50}
+                    height={50}
+                    className="h-10 sm:h-12 w-auto object-contain opacity-80"
+                  />
+                  {/* ADDED: FastAPI */}
+                  <Image
+                    src={LOGO_FASTAPI}
+                    alt="FastAPI"
+                    width={140}
+                    height={60}
+                    className="h-8 sm:h-10 w-auto object-contain opacity-80"
+                  />
                   <Image
                     src={LOGO_TAILWIND}
                     alt="Tailwind"
-                    width={100}
-                    height={24}
-                    className="h-6 w-full object-contain"
+                    width={280}
+                    height={60}
+                    className="h-8 sm:h-10 w-auto object-contain opacity-80"
                   />
-                </div>
-                <span className="font-bold text-xs text-slate-500">
-                  Tailwind CSS
-                </span>
-              </div>
-
-              {/* Supabase */}
-              <div className="flex flex-col items-center gap-3 w-20 group">
-                <div className="h-14 w-14 flex items-center justify-center bg-white rounded-xl shadow-sm p-2 group-hover:-translate-y-1 transition-transform">
-                  <Database size={32} className="text-emerald-500" />
-                </div>
-                <span className="font-bold text-xs text-slate-500">
-                  Supabase
-                </span>
-              </div>
-
-              {/* PostgreSQL */}
-              <div className="flex flex-col items-center gap-3 w-20 group">
-                <div className="h-14 w-14 flex items-center justify-center bg-white rounded-xl shadow-sm p-2 group-hover:-translate-y-1 transition-transform">
+                  <div className="flex items-center gap-2 opacity-80">
+                    <Image
+                      src={LOGO_SUPABASE}
+                      alt="Supabase"
+                      width={40}
+                      height={40}
+                      className="h-8 sm:h-10 w-auto object-contain"
+                    />
+                    <span className="font-bold text-[#3ECF8E] text-lg">
+                      Supabase
+                    </span>
+                  </div>
                   <Image
                     src={LOGO_POSTGRES}
                     alt="Postgres"
-                    width={56}
-                    height={56}
-                    className="h-full w-full object-contain"
+                    width={50}
+                    height={50}
+                    className="h-10 sm:h-12 w-auto object-contain opacity-80"
                   />
                 </div>
-                <span className="font-bold text-xs text-slate-500">
-                  PostgreSQL
-                </span>
-              </div>
-
-              {/* Leaflet */}
-              <div className="flex flex-col items-center gap-3 w-20 group">
-                <div className="h-14 w-14 flex items-center justify-center bg-white rounded-xl shadow-sm p-2 group-hover:-translate-y-1 transition-transform">
-                  <Image
-                    src={LOGO_LEAFLET}
-                    alt="Leaflet"
-                    width={56}
-                    height={56}
-                    className="h-full w-full object-contain"
-                  />
-                </div>
-                <span className="font-bold text-xs text-slate-500">
-                  Leaflet Map
-                </span>
-              </div>
-
-              {/* Recharts */}
-              <div className="flex flex-col items-center gap-3 w-32 group">
-                <div className="h-14 w-auto px-4 flex items-center justify-center bg-white rounded-xl shadow-sm group-hover:-translate-y-1 transition-transform">
-                  <Image
-                    src={LOGO_RECHARTS}
-                    alt="Recharts"
-                    width={100}
-                    height={32}
-                    className="h-8 w-full object-contain grayscale hover:grayscale-0 transition"
-                  />
-                </div>
-                <span className="font-bold text-xs text-slate-500">
-                  Recharts
-                </span>
-              </div>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* SENTRALISASI DATA */}
+        {/* FITUR SECTION (Glassmorphism Cards) */}
         <section
           id="features"
-          className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-20 xl:py-24 text-center space-y-8 sm:space-y-12 lg:space-y-16"
+          className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 text-center z-10 relative"
         >
-          <div className="max-w-2xl mx-auto space-y-3 sm:space-y-4">
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold">
-              Sentralisasi Data & <br />
-              <span className={primaryColor}>Manajemen Aset</span>
-            </h2>
-            <p
-              className={`text-sm sm:text-base ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}
-            >
-              Kelola seluruh aset transmisi dalam satu sistem terintegrasi.
-              Tidak perlu lagi file manual yang terpisah.
-            </p>
-          </div>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-4">
+            Sentralisasi Data &{" "}
+            <span className={primaryColor}>Manajemen Aset</span>
+          </h2>
+          <p
+            className={`text-sm sm:text-base max-w-2xl mx-auto mb-12 ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}
+          >
+            Kelola seluruh aset transmisi dalam satu sistem terintegrasi.
+            Ucapkan selamat tinggal pada file manual yang terpencar.
+          </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8">
-            {/* Feature 1 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 text-left">
+            {/* Card 1 */}
             <div
-              className={`p-5 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl shadow-lg border hover:-translate-y-2 transition-transform duration-300 ${
-                isDarkMode
-                  ? "bg-slate-800 border-slate-700"
-                  : "bg-white border-slate-100"
-              }`}
+              className={`group relative p-8 rounded-3xl border backdrop-blur-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_10px_40px_-10px_rgba(27,122,143,0.3)] overflow-hidden ${isDarkMode ? "bg-slate-800/80 border-slate-700" : "bg-white border-slate-200 shadow-lg"}`}
             >
-              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 mx-auto mb-3 sm:mb-4 lg:mb-6 bg-green-100 rounded-xl sm:rounded-2xl flex items-center justify-center text-green-600">
-                <MapIcon size={24} className="sm:w-7 sm:h-7 lg:w-8 lg:h-8" />
+              <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-[#1B7A8F] to-[#2ecc71] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="w-14 h-14 mb-6 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
+                <MapIcon size={28} />
               </div>
-              <h3 className="text-base sm:text-lg lg:text-xl font-bold mb-2 sm:mb-3">
-                Multi-Unit Management
-              </h3>
+              <h3 className="text-xl font-bold mb-3">Pemetaan WebGIS</h3>
               <p
-                className={`text-xs sm:text-sm leading-relaxed ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}
+                className={`text-sm leading-relaxed ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}
               >
-                Kelola data dari berbagai ULTG (Lopana, Sawangan, Kotamobagu,
-                Gorontalo) tanpa batasan wilayah.
+                Visualisasi lokasi Gardu Induk interaktif (ULTG Lopana,
+                Sawangan, Kotamobagu, Gorontalo) terintegrasi koordinat real.
               </p>
             </div>
 
-            {/* Feature 2 */}
+            {/* Card 2 */}
             <div
-              className={`p-5 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl shadow-lg border hover:-translate-y-2 transition-transform duration-300 ${
-                isDarkMode
-                  ? "bg-slate-800 border-slate-700"
-                  : "bg-white border-slate-100"
-              }`}
+              className={`group relative p-8 rounded-3xl border backdrop-blur-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_10px_40px_-10px_rgba(27,122,143,0.3)] overflow-hidden ${isDarkMode ? "bg-slate-800/80 border-slate-700" : "bg-white border-slate-200 shadow-lg"}`}
             >
-              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 mx-auto mb-3 sm:mb-4 lg:mb-6 bg-blue-100 rounded-xl sm:rounded-2xl flex items-center justify-center text-blue-600">
-                <ShieldCheck
-                  size={24}
-                  className="sm:w-7 sm:h-7 lg:w-8 lg:h-8"
-                />
+              <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-[#F1C40F] to-[#f39c12] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="w-14 h-14 mb-6 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600 group-hover:scale-110 transition-transform">
+                <Activity size={28} />
               </div>
-              <h3 className="text-base sm:text-lg lg:text-xl font-bold mb-2 sm:mb-3">
-                Role-Based Access
-              </h3>
+              <h3 className="text-xl font-bold mb-3">AI Prediktif</h3>
               <p
-                className={`text-xs sm:text-sm leading-relaxed ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}
+                className={`text-sm leading-relaxed ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}
               >
-                Keamanan data terjamin dengan pembagian hak akses spesifik
-                (Super Admin, Manager Unit, & Viewer).
+                Algoritma cerdas yang memprediksi kesehatan trafo menggunakan
+                klasifikasi gas Duval Pentagon & IEEE secara otomatis.
               </p>
             </div>
 
-            {/* Feature 3 */}
+            {/* Card 3 */}
             <div
-              className={`p-5 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl shadow-lg border hover:-translate-y-2 transition-transform duration-300 ${
-                isDarkMode
-                  ? "bg-slate-800 border-slate-700"
-                  : "bg-white border-slate-100"
-              }`}
+              className={`group relative p-8 rounded-3xl border backdrop-blur-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_10px_40px_-10px_rgba(27,122,143,0.3)] overflow-hidden ${isDarkMode ? "bg-slate-800/80 border-slate-700" : "bg-white border-slate-200 shadow-lg"}`}
             >
-              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 mx-auto mb-3 sm:mb-4 lg:mb-6 bg-purple-100 rounded-xl sm:rounded-2xl flex items-center justify-center text-purple-600">
-                <Zap size={24} className="sm:w-7 sm:h-7 lg:w-8 lg:h-8" />
+              <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-purple-500 to-[#1B7A8F] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="w-14 h-14 mb-6 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform">
+                <Database size={28} />
               </div>
-              <h3 className="text-base sm:text-lg lg:text-xl font-bold mb-2 sm:mb-3">
-                Seamless Integration
-              </h3>
+              <h3 className="text-xl font-bold mb-3">Database Relasional</h3>
               <p
-                className={`text-xs sm:text-sm leading-relaxed ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}
+                className={`text-sm leading-relaxed ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}
               >
-                Database yang siap diintegrasikan dengan sistem korporat atau
-                sensor IoT di masa depan.
+                Keamanan data terpusat menggunakan PostgreSQL (Supabase) dengan
+                pembagian hak akses (Super Admin, Manager, Viewer).
               </p>
             </div>
           </div>
         </section>
 
-        {/* TRANSFORMASI DGA */}
+        {/* TENTANG KAMI */}
         <section
           id="about"
-          className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-20 grid grid-cols-1 md:grid-cols-2 items-center gap-6 sm:gap-8 lg:gap-12"
+          className={`py-16 lg:py-24 ${isDarkMode ? "bg-slate-900/40" : "bg-slate-100/50"}`}
         >
-          <div className="order-2 md:order-1 relative flex justify-center h-[220px] sm:h-[280px] md:h-[320px] lg:h-[400px] xl:h-[450px] w-full overflow-hidden rounded-xl sm:rounded-2xl shadow-2xl">
-            <Image
-              src={LAB_IMAGE_SOURCE}
-              alt="Proses Uji Laboratorium dan Digitalisasi"
-              fill
-              className="object-cover transition-transform duration-700 hover:scale-105"
-              style={{ objectPosition: "center" }}
-            />
-          </div>
-
-          <div className="order-1 md:order-2 space-y-3 sm:space-y-4 lg:space-y-6">
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">
-              Transformasi Pengujian DGA <br />
-              <span className="text-blue-800">Dari Lab ke Digital</span>
-            </h2>
-            <p
-              className={`text-sm sm:text-base lg:text-lg leading-relaxed ${
-                isDarkMode ? "text-slate-400" : "text-slate-600"
-              }`}
-            >
-              Mengonversi data hasil uji laboratorium menjadi wawasan{" "}
-              <em>real-time</em> untuk pemeliharaan aset yang lebih proaktif.
-              Kami memadukan ketelitian prosedur uji manual dengan kecepatan
-              analisis digital.
-            </p>
-
-            <button
-              onClick={onStart}
-              className={`px-5 py-2.5 sm:px-6 sm:py-3 lg:px-8 lg:py-3 rounded text-white font-bold text-sm sm:text-base shadow-lg transition-transform hover:-translate-y-1 ${btnGreen}`}
-            >
-              Pelajari Selengkapnya
-            </button>
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 items-center gap-12">
+            <div className="relative h-[300px] sm:h-[400px] lg:h-[450px] w-full rounded-3xl overflow-hidden shadow-2xl">
+              <Image
+                src={LAB_IMAGE_SOURCE}
+                alt="Proses Uji Laboratorium"
+                fill
+                className="object-cover transition-transform duration-700 hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-[#1B7A8F]/20 mix-blend-multiply"></div>
+            </div>
+            <div className="space-y-6">
+              <h2 className="text-3xl lg:text-4xl font-extrabold leading-tight">
+                Transformasi Pengujian DGA <br />
+                <span className={primaryColor}>Dari Lab ke Digital</span>
+              </h2>
+              <p
+                className={`text-base lg:text-lg leading-relaxed ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}
+              >
+                Mengonversi data hasil uji laboratorium menjadi wawasan{" "}
+                <em>real-time</em> untuk pemeliharaan aset yang lebih proaktif.
+                Platform ini adalah wujud nyata dedikasi kami untuk memadukan
+                ketelitian prosedur standar dengan kecepatan eksekusi digital.
+              </p>
+              <ul
+                className={`space-y-4 font-medium ${isDarkMode ? "text-slate-300" : "text-slate-700"}`}
+              >
+                <li className="flex items-center gap-3">
+                  <Zap className="text-[#F1C40F]" size={20} /> Monitoring
+                  Berkala
+                </li>
+                <li className="flex items-center gap-3">
+                  <Zap className="text-[#F1C40F]" size={20} /> Ekspor Laporan
+                  Otomatis (PDF/Excel)
+                </li>
+                <li className="flex items-center gap-3">
+                  <Zap className="text-[#F1C40F]" size={20} /> Peringatan Dini
+                  Status Kritis
+                </li>
+              </ul>
+            </div>
           </div>
         </section>
       </main>
 
       {/* FOOTER */}
       <footer
-        className={`py-8 sm:py-10 lg:py-12 border-t ${
-          isDarkMode
-            ? "bg-slate-900 border-slate-800"
-            : "bg-[#263238] text-white border-slate-800"
-        }`}
+        className={`py-12 border-t ${isDarkMode ? "bg-[#0f172a] border-slate-800" : "bg-[#1B7A8F] text-white border-none"}`}
       >
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-          <div className="col-span-1 sm:col-span-2 lg:col-span-1">
-            <div className="flex items-center gap-2 mb-3 sm:mb-4">
-              <Zap className="text-[#F1C40F]" size={20} fill="currentColor" />
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
-                PLN SMART
-              </h2>
+        {/* Perbaikan grid: 4 kolom rapi untuk layar besar */}
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Kolom 1: Identitas */}
+          <div className="lg:col-span-1">
+            <div className="flex items-center gap-2 mb-4">
+              <Zap className="text-[#F1C40F]" size={24} fill="currentColor" />
+              <h2 className="text-xl font-extrabold text-white">PLN SMART</h2>
             </div>
-            <p className="text-slate-400 text-xs sm:text-sm max-w-xs">
+            <p className="text-sm opacity-80 max-w-xs leading-relaxed text-slate-200">
               Sistem Manajemen Aset & Analisis DGA Terintegrasi untuk PLN UPT
               Manado.
             </p>
           </div>
+
+          {/* Kolom 2: Navigasi */}
           <div>
-            <h4 className="font-bold text-white mb-3 sm:mb-4 text-sm sm:text-base">
-              Navigasi
-            </h4>
-            <ul className="space-y-2 text-xs sm:text-sm text-slate-400">
+            <h4 className="font-bold text-white mb-4">Navigasi Utama</h4>
+            <ul className="space-y-3 text-sm opacity-80 text-slate-200">
               <li>
-                <Link href="#" className="hover:text-white">
+                <Link
+                  href="#"
+                  className="hover:text-[#F1C40F] transition-colors"
+                >
                   Beranda
                 </Link>
               </li>
               <li>
-                <a href="#features" className="hover:text-white">
-                  Fitur
+                <a
+                  href="#features"
+                  className="hover:text-[#F1C40F] transition-colors"
+                >
+                  Fitur Unggulan
                 </a>
               </li>
               <li>
                 <button
                   onClick={onGuide}
-                  className="hover:text-white bg-transparent border-none p-0 cursor-pointer"
+                  className="hover:text-[#F1C40F] transition-colors"
                 >
-                  Panduan
+                  Buku Panduan
                 </button>
               </li>
             </ul>
           </div>
+
+          {/* Kolom 3: Kontak PLN */}
           <div>
-            <h4 className="font-bold text-white mb-3 sm:mb-4 text-sm sm:text-base">
-              Kontak
-            </h4>
-            <ul className="space-y-2 text-xs sm:text-sm text-slate-400">
-              <li>PT. PLN (PERSERO) UPT MANADO</li>
-              <li>Jl. Tompakwa No.1, Bumi Nyiur, Kec. Wanea, Kota Manado</li>
-              <li>Sulawesi Utara</li>
+            <h4 className="font-bold text-white mb-4">Informasi Kontak</h4>
+            <ul className="space-y-2 text-sm opacity-80 leading-relaxed text-slate-200">
+              <li className="font-semibold text-white">
+                PT. PLN (PERSERO) UPT MANADO
+              </li>
+              <li>
+                Jl. Tompakwa No.1, Bumi Nyiur, Kec. Wanea, Kota Manado, Sulawesi
+                Utara
+              </li>
             </ul>
           </div>
+
+          {/* Kolom 4: Tribute Pengembang */}
+          <div>
+            <h4 className="font-bold text-white mb-4">Tim Pengembang</h4>
+            <div className="space-y-3 text-sm opacity-80 text-slate-200">
+              <ul className="space-y-1">
+                <li className="font-semibold text-[#F1C40F] drop-shadow-sm">
+                  Jeremia Paduli
+                </li>
+                <li className="font-semibold text-[#F1C40F] drop-shadow-sm">
+                  Jonathan Kaligis
+                </li>
+              </ul>
+              <div className="pt-3 border-t border-white/20">
+                <p className="text-xs italic leading-relaxed">
+                  Mahasiswa Kerja Praktek <br />
+                  Teknik Informatika <br />
+                  Universitas Sam Ratulangi
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-8 sm:mt-10 lg:mt-12 pt-6 sm:pt-7 lg:pt-8 border-t border-slate-700 text-center text-[10px] sm:text-xs text-slate-500">
-          &copy; 2026 Kerja Praktek Teknik Informatika UNSRAT - PLN UPT Manado.
+
+        {/* Copyright Bar */}
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-white/10 text-center text-xs opacity-60 text-white">
+          &copy; 2026 Kerja Praktek Teknik Informatika UNSRAT - PT PLN (Persero)
+          UPT Manado. All rights reserved.
         </div>
       </footer>
     </div>

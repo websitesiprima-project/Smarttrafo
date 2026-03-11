@@ -13,7 +13,7 @@ import {
   AlertTriangle,
   Edit3,
 } from "lucide-react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -246,7 +246,7 @@ export default function UnitManagementPage() {
 
     if (oldName === newName.trim()) {
       setEditUltgModal({ show: false, oldName: "", newName: "" });
-      return toast.info("Tidak ada perubahan nama ULTG");
+      return toast("Tidak ada perubahan nama ULTG");
     }
 
     setEditUltgModal({ ...editUltgModal, show: false });

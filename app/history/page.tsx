@@ -24,7 +24,7 @@ import {
   Save,
   FileSpreadsheet,
 } from "lucide-react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import { generatePDFFromTemplate, generatePDFBlob } from "@/utils/PDFGenerator";
 import DuvalPentagon from "@/components/DuvalPentagon";
 import JSZip from "jszip";
@@ -446,7 +446,7 @@ export default function HistoryPage() {
   };
 
   const handleClearAll = async () => {
-    if (historyData.length === 0) return toast.info("Data kosong.");
+    if (historyData.length === 0) return toast("Data kosong.");
     setDeleteTarget({ type: "all", count: historyData.length });
     setDeleteConfirmText("");
     setShowDeleteModal(true);
@@ -469,8 +469,8 @@ export default function HistoryPage() {
   };
 
   const handleBatchDownload = async () => {
-    if (selectedIds.length === 0) return toast.warning("Pilih minimal 1 data.");
-    toast.info(`Memproses ${selectedIds.length} data...`);
+    if (selectedIds.length === 0) return toast("Pilih minimal 1 data.");
+    toast(`Memproses ${selectedIds.length} data...`);
     const zip = new JSZip();
     let successCount = 0;
 
@@ -516,7 +516,7 @@ export default function HistoryPage() {
   };
 
   const handleBatchDelete = async () => {
-    if (selectedIds.length === 0) return toast.warning("Pilih minimal 1 data.");
+    if (selectedIds.length === 0) return toast("Pilih minimal 1 data.");
     setDeleteTarget({ type: "batch", count: selectedIds.length });
     setShowDeleteModal(true);
   };

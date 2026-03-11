@@ -63,7 +63,7 @@ interface ResultState {
 }
 
 import { useAppContext } from "@/app/AppContext";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 
 export default function InputFormPage() {
   const {

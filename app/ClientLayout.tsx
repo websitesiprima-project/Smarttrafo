@@ -20,7 +20,7 @@ import {
 import ThemeToggle from "@/components/ThemeToggle";
 import VoltyAssistant from "@/components/VoltyAssistant";
 import VoltyMascot from "@/components/VoltyMascot";
-import { Toaster, toast } from "sonner";
+import { Toaster, toast } from "react-hot-toast";
 import { useAppContext } from "./AppContext";
 
 const MenuButton = ({ icon, label, active, onClick, isDarkMode }: any) => (
@@ -115,7 +115,13 @@ export default function ClientLayout({
       suppressHydrationWarning
       className={`min-h-screen font-sans transition-colors duration-500 ${isDarkMode ? "bg-[#0f172a] text-slate-200 dark" : "bg-slate-100 text-slate-800"}`}
     >
-      <Toaster position="top-center" richColors />
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          className: isDarkMode ? "!bg-slate-800 !text-white" : "",
+          duration: 3000,
+        }}
+      />
 
       {/* Modal Logout */}
       {showLogoutModal && (

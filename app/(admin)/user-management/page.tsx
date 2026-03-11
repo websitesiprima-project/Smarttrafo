@@ -19,7 +19,7 @@ import {
   Mail,
   Edit3,
 } from "lucide-react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import { supabase } from "@/lib/supabaseClient";
 
 // URL API Backend

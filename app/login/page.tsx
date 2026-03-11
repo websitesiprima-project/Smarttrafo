@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { Zap, Loader2, Lock, Mail, ArrowRight, Activity } from "lucide-react";
-import { toast, Toaster } from "sonner"; // Ensure Toaster is imported
+import toast from "react-hot-toast";
 import ThemeToggle from "@/components/ThemeToggle"; // Import fixed
 
 const LoginPage = () => {
@@ -65,7 +65,7 @@ const LoginPage = () => {
 
   return (
     <>
-      <Toaster position="top-center" richColors />
+      
 
       {/* LOADING OVERLAY FULLSCREEN */}
       {loading && (
@@ -291,7 +291,7 @@ const LoginPage = () => {
                   Lupa password atau kendala akses?{" "}
                   <button
                     onClick={() =>
-                      toast.info("Silakan hubungi Admin ULTG di Extension 123")
+                      toast("Silakan hubungi Admin ULTG di Extension 123")
                     }
                     className={`font-bold transition-colors hover:underline ${isDarkMode ? "text-[#1B7A8F] hover:text-[#FFD700]" : "text-[#1B7A8F] hover:text-[#16697a]"}`}
                   >
