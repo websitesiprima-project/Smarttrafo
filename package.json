@@ -13,7 +13,7 @@
   "dependencies": {
     "@ai-sdk/groq": "^3.0.29",
     "@supabase/supabase-js": "^2.98.0",
-    "ai": "^6.0.116",
+    "ai": "^6.0.140",
     "file-saver": "^2.0.5",
     "framer-motion": "^12.34.3",
     "jspdf": "^4.2.0",

@@ -533,6 +533,31 @@ def add_trafo(data: TrafoBaruInput):
     except Exception as e:
         return {"status": "Error", "msg": str(e)}
 
+
+@app.get("/api/keep-alive")
+async def keep_alive():
+    # Cek dulu apakah objek supabase tersedia
+    if supabase is None:
+        return {
+            "status": "error", 
+            "message": "Koneksi database belum diinisialisasi (None)."
+        }
+
+    try:
+        # Pylance sekarang tahu supabase pasti ada di sini
+        response = supabase.table('nama_tabel_anda').select("id").limit(1).execute()
+        
+        return {
+            "status": "success",
+            "message": "Supabase is awake and running! ⚡",
+            "timestamp": "Ping berhasil dieksekusi."
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Gagal membangunkan Supabase: {str(e)}"
+        }
+
 # --- 2. PREDICT / ANALISIS ---
 @app.post("/predict")
 def predict(data: TrafoInput):
