@@ -133,7 +133,7 @@ const GuidePage = ({ initialTab = "ieee" }: { initialTab?: string }) => {
       {/* HEADER */}
       <header className="mb-8 border-b border-slate-500/20 pb-6 px-2">
         <h2
-          className={`text-2xl md:text-3xl font-bold mb-2 flex items-center gap-3 ${isDarkMode ? "text-white" : "text-[#1B7A8F]"}`}
+          className={`text-2xl md:text-3xl font-bold mb-2 flex items-center gap-3 ${isDarkMode ? "text-white" : "text-[#146C94]"}`}
         >
           <BookOpen className="text-[#17A2B8] shrink-0" size={32} />
           Pusat Panduan & Standar
@@ -150,7 +150,7 @@ const GuidePage = ({ initialTab = "ieee" }: { initialTab?: string }) => {
           onClick={() => setActiveTab("ieee")}
           className={`px-4 py-2.5 rounded-xl font-bold text-sm transition-all whitespace-nowrap border snap-start ${
             activeTab === "ieee"
-              ? "bg-[#1B7A8F] text-white border-[#1B7A8F] shadow-lg scale-105"
+              ? "bg-[#146C94] text-white border-[#146C94] shadow-lg scale-105"
               : isDarkMode
                 ? "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700"
                 : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
@@ -189,7 +189,7 @@ const GuidePage = ({ initialTab = "ieee" }: { initialTab?: string }) => {
           onClick={() => setActiveTab("spln")}
           className={`px-4 py-2.5 rounded-xl font-bold text-sm transition-all whitespace-nowrap border snap-start ${
             activeTab === "spln"
-              ? "bg-[#FFD700] text-gray-900 border-[#FFD700] shadow-lg scale-105"
+              ? "bg-[#F1C40F] text-gray-900 border-[#F1C40F] shadow-lg scale-105"
               : isDarkMode
                 ? "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700"
                 : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
@@ -208,8 +208,8 @@ const GuidePage = ({ initialTab = "ieee" }: { initialTab?: string }) => {
               className={`p-5 md:p-6 rounded-2xl border animate-in fade-in zoom-in-95 duration-300 ${isDarkMode ? "bg-[#1e293b] border-slate-700" : "bg-[#FFFFFF] border-slate-200 shadow-sm"}`}
             >
               <div className="flex items-center gap-4 mb-6 border-b border-slate-500/20 pb-4">
-                <div className="p-3 bg-[#1B7A8F]/10 rounded-xl shrink-0">
-                  <FileText className="text-[#1B7A8F]" size={28} />
+                <div className="p-3 bg-[#146C94]/10 rounded-xl shrink-0">
+                  <FileText className="text-[#146C94]" size={28} />
                 </div>
                 <div>
                   <h3 className="text-lg md:text-xl font-bold">
@@ -436,8 +436,8 @@ const GuidePage = ({ initialTab = "ieee" }: { initialTab?: string }) => {
               className={`p-5 md:p-6 rounded-2xl border animate-in fade-in zoom-in-95 duration-300 ${isDarkMode ? "bg-[#1e293b] border-slate-700" : "bg-[#FFFFFF] border-slate-200 shadow-sm"}`}
             >
               <div className="flex items-center gap-4 mb-6 border-b border-slate-500/20 pb-4">
-                <div className="p-3 bg-[#FFD700]/10 rounded-xl shrink-0">
-                  <AlertTriangle className="text-[#FFD700]" size={28} />
+                <div className="p-3 bg-[#F1C40F]/10 rounded-xl shrink-0">
+                  <AlertTriangle className="text-[#F1C40F]" size={28} />
                 </div>
                 <div>
                   <h3 className="text-lg md:text-xl font-bold">
@@ -451,7 +451,7 @@ const GuidePage = ({ initialTab = "ieee" }: { initialTab?: string }) => {
 
               <div className="space-y-6">
                 <div
-                  className={`p-4 md:p-5 rounded-xl border-l-4 border-l-[#FFD700] ${isDarkMode ? "bg-amber-500/5 border-slate-700" : "bg-amber-50 border-amber-200"}`}
+                  className={`p-4 md:p-5 rounded-xl border-l-4 border-l-[#F1C40F] ${isDarkMode ? "bg-amber-500/5 border-slate-700" : "bg-amber-50 border-amber-200"}`}
                 >
                   <p className="text-sm md:text-base text-justify opacity-90 leading-relaxed">
                     PLN menggunakan metode{" "}
@@ -462,7 +462,7 @@ const GuidePage = ({ initialTab = "ieee" }: { initialTab?: string }) => {
                 </div>
 
                 <div>
-                  <h4 className="font-bold text-[#FFD700] mb-3 text-sm md:text-base">
+                  <h4 className="font-bold text-[#F1C40F] mb-3 text-sm md:text-base">
                     Klasifikasi Kondisi TDCG
                   </h4>
                   <div className="overflow-x-auto rounded-xl border border-slate-500/20">
@@ -543,7 +543,7 @@ const GuidePage = ({ initialTab = "ieee" }: { initialTab?: string }) => {
           <div
             className={`p-5 md:p-6 rounded-2xl border shadow-sm mt-6 ${isDarkMode ? "bg-[#1e293b] border-slate-700" : "bg-white border-slate-200"}`}
           >
-            <h3 className="font-bold mb-5 flex items-center gap-2 text-[#1B7A8F] text-lg">
+            <h3 className="font-bold mb-5 flex items-center gap-2 text-[#146C94] text-lg">
               <HelpCircle size={22} /> Pertanyaan Umum (FAQ)
             </h3>
 
@@ -566,7 +566,7 @@ const GuidePage = ({ initialTab = "ieee" }: { initialTab?: string }) => {
           <div
             className={`p-5 md:p-6 rounded-2xl border shadow-sm sticky top-24 z-10 ${isDarkMode ? "bg-[#1e293b] border-slate-700" : "bg-white border-slate-200"}`}
           >
-            <h3 className="font-bold mb-5 flex items-center gap-2 text-[#1B7A8F] text-lg">
+            <h3 className="font-bold mb-5 flex items-center gap-2 text-[#146C94] text-lg">
               <CheckCircle size={22} /> Legenda Status
             </h3>
             <ul className="space-y-5 text-sm">
@@ -611,7 +611,7 @@ const GuidePage = ({ initialTab = "ieee" }: { initialTab?: string }) => {
           <div
             className={`p-5 md:p-6 rounded-2xl border shadow-sm ${isDarkMode ? "bg-[#1e293b] border-slate-700" : "bg-white border-slate-200"}`}
           >
-            <h3 className="font-bold mb-4 flex items-center gap-2 text-[#1B7A8F] text-lg">
+            <h3 className="font-bold mb-4 flex items-center gap-2 text-[#146C94] text-lg">
               <Info size={22} /> Kamus Gas Residu
             </h3>
             <div className="space-y-3 text-[13px]">

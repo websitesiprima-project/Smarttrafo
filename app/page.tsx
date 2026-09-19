@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   Map as MapIcon,
   Activity,
+  Cpu,
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -18,7 +19,7 @@ const HERO_IMAGE_SOURCE =
   "https://images.unsplash.com/photo-1548337138-e87d889cc369?q=80&w=2070&auto=format&fit=crop";
 const LAB_IMAGE_SOURCE =
   "https://images.unsplash.com/photo-1581093450021-4a7360e9a6b5?q=80&w=2070&auto=format&fit=crop";
-const LOGO_SMART = "/assets/Logo_SMART.jpg";
+const LOGO_SMART = "/assets/LOGO_SMARTTRAFO.png";
 
 // --- LOGO TECH STACK (SVG CDN untuk Kualitas HD) ---
 const LOGO_NEXTJS =
@@ -57,10 +58,10 @@ export default function LandingPage() {
   const onStart = () => router.push("/login");
   const onGuide = () => router.push("/login");
 
-  const primaryColor = "text-[#1B7A8F]";
-  const bgPrimary = "bg-[#1B7A8F]";
+  const primaryColor = "text-[#146C94]";
+  const bgPrimary = "bg-[#146C94]";
   const btnGreen =
-    "bg-linear-to-r from-[#1B7A8F] to-[#156b7d] hover:from-[#156b7d] hover:to-[#0f4d5a]";
+    "bg-linear-to-r from-[#146C94] to-[#0F5678] hover:from-[#0F5678] hover:to-[#0F5678]";
 
   return (
     <div
@@ -116,17 +117,16 @@ export default function LandingPage() {
             <div className="bg-white p-1 sm:p-1.5 rounded-lg sm:rounded-xl shadow-sm border border-slate-200 flex items-center justify-center overflow-hidden">
               <Image
                 src={LOGO_SMART}
-                alt="Logo SMART"
+                alt="Logo SMARTTRAFO"
                 width={40}
                 height={40}
                 className="w-6 h-6 sm:w-8 sm:h-8 object-contain"
-                // Hapus mix-blend-multiply agar warna asli logonya keluar dan tajam
               />
             </div>
             <h1
-              className={`text-base sm:text-xl font-extrabold tracking-tight ${isDarkMode ? "text-white" : "text-[#1B7A8F]"}`}
+              className={`text-base sm:text-xl font-extrabold tracking-tight ${isDarkMode ? "text-white" : "text-[#146C94]"}`}
             >
-              PLN <span className="text-[#F1C40F]">SMART</span>
+              SMART<span className="text-[#F1C40F]">TRAFO</span>
             </h1>
           </div>
         </div>
@@ -134,25 +134,25 @@ export default function LandingPage() {
         <div className="hidden md:flex gap-8 text-sm font-semibold text-slate-500 dark:text-slate-400">
           <Link
             href="#"
-            className="hover:text-[#1B7A8F] dark:hover:text-[#F1C40F] transition-colors"
+            className="hover:text-[#146C94] dark:hover:text-[#F1C40F] transition-colors"
           >
             Beranda
           </Link>
           <a
             href="#features"
-            className="hover:text-[#1B7A8F] dark:hover:text-[#F1C40F] transition-colors"
+            className="hover:text-[#146C94] dark:hover:text-[#F1C40F] transition-colors"
           >
             Fitur
           </a>
           <a
             href="#tech"
-            className="hover:text-[#1B7A8F] dark:hover:text-[#F1C40F] transition-colors"
+            className="hover:text-[#146C94] dark:hover:text-[#F1C40F] transition-colors"
           >
             Teknologi
           </a>
           <a
             href="#about"
-            className="hover:text-[#1B7A8F] dark:hover:text-[#F1C40F] transition-colors"
+            className="hover:text-[#146C94] dark:hover:text-[#F1C40F] transition-colors"
           >
             Tentang
           </a>
@@ -173,19 +173,19 @@ export default function LandingPage() {
 
       <main className="relative">
         {/* EFEK GLOWING BACKGROUND (Subtle Blobs) */}
-        <div className="absolute top-20 left-0 w-[500px] h-[500px] bg-[#1B7A8F]/20 rounded-full filter blur-[100px] opacity-60 pointer-events-none dark:bg-[#1B7A8F]/10"></div>
+        <div className="absolute top-20 left-0 w-[500px] h-[500px] bg-[#146C94]/20 rounded-full filter blur-[100px] opacity-60 pointer-events-none dark:bg-[#146C94]/10"></div>
         <div className="absolute top-40 right-0 w-[400px] h-[400px] bg-[#F1C40F]/15 rounded-full filter blur-[100px] opacity-60 pointer-events-none dark:bg-[#F1C40F]/10"></div>
 
         {/* HERO SECTION */}
         <section className="container relative mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-24 flex flex-col-reverse md:flex-row items-center gap-10 lg:gap-16 z-10">
           <div className="flex-1 space-y-5 lg:space-y-7 animate-in slide-in-from-left-10 duration-700">
-            <div className="inline-block px-4 py-1.5 rounded-full bg-blue-100/50 text-[#1B7A8F] font-semibold text-xs sm:text-sm border border-blue-200 dark:bg-slate-800 dark:text-blue-400 dark:border-slate-700 backdrop-blur-sm mb-2">
-              ✨ Sistem Berbasis Machine Learning
+            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-blue-100/50 text-[#146C94] font-semibold text-xs sm:text-sm border border-blue-200 dark:bg-slate-800 dark:text-blue-400 dark:border-slate-700 backdrop-blur-sm mb-2">
+              <Cpu size={14} /> Sistem Berbasis Machine Learning
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold leading-[1.15]">
               Transformasi Digital <br />
               {/* GRADIENT TEXT */}
-              <span className="bg-clip-text text-transparent bg-linear-to-r from-[#1B7A8F] to-[#2ecc71] drop-shadow-sm">
+              <span className="bg-clip-text text-transparent bg-linear-to-r from-[#146C94] to-[#28A8E0] drop-shadow-sm">
                 Monitoring Aset Transmisi
               </span>
             </h2>
@@ -366,7 +366,7 @@ export default function LandingPage() {
             <div
               className={`group relative p-8 rounded-3xl border backdrop-blur-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_10px_40px_-10px_rgba(27,122,143,0.3)] overflow-hidden ${isDarkMode ? "bg-slate-800/80 border-slate-700" : "bg-white border-slate-200 shadow-lg"}`}
             >
-              <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-[#1B7A8F] to-[#2ecc71] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-[#146C94] to-[#28A8E0] opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <div className="w-14 h-14 mb-6 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
                 <MapIcon size={28} />
               </div>
@@ -400,7 +400,7 @@ export default function LandingPage() {
             <div
               className={`group relative p-8 rounded-3xl border backdrop-blur-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_10px_40px_-10px_rgba(27,122,143,0.3)] overflow-hidden ${isDarkMode ? "bg-slate-800/80 border-slate-700" : "bg-white border-slate-200 shadow-lg"}`}
             >
-              <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-purple-500 to-[#1B7A8F] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-purple-500 to-[#146C94] opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <div className="w-14 h-14 mb-6 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform">
                 <Database size={28} />
               </div>
@@ -428,7 +428,7 @@ export default function LandingPage() {
                 fill
                 className="object-cover transition-transform duration-700 hover:scale-105"
               />
-              <div className="absolute inset-0 bg-[#1B7A8F]/20 mix-blend-multiply"></div>
+              <div className="absolute inset-0 bg-[#146C94]/20 mix-blend-multiply"></div>
             </div>
             <div className="space-y-6">
               <h2 className="text-3xl lg:text-4xl font-extrabold leading-tight">
@@ -466,7 +466,7 @@ export default function LandingPage() {
 
       {/* FOOTER */}
       <footer
-        className={`py-12 border-t ${isDarkMode ? "bg-[#0f172a] border-slate-800" : "bg-[#1B7A8F] text-white border-none"}`}
+        className={`py-12 border-t ${isDarkMode ? "bg-[#0f172a] border-slate-800" : "bg-[#146C94] text-white border-none"}`}
       >
         {/* Perbaikan grid: 4 kolom rapi untuk layar besar */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -474,7 +474,7 @@ export default function LandingPage() {
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2 mb-4">
               <Zap className="text-[#F1C40F]" size={24} fill="currentColor" />
-              <h2 className="text-xl font-extrabold text-white">PLN SMART</h2>
+              <h2 className="text-xl font-extrabold text-white">SMARTTRAFO</h2>
             </div>
             <p className="text-sm opacity-80 max-w-xs leading-relaxed text-slate-200">
               Sistem Manajemen Aset & Analisis DGA Terintegrasi untuk PLN UPT

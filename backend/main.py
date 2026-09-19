@@ -1,21 +1,24 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Header, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import joblib
-import numpy as np
+import pandas as pd
 import os
-import sys
 import math
+import logging
 from groq import Groq
 from supabase import create_client, Client
-from dotenv import load_dotenv 
-from typing import Any, cast, Dict, List, Optional
+from dotenv import load_dotenv
+from typing import Any, cast, Dict, Optional
 
 # ==========================================
 # 1. LOAD ENVIRONMENT
 # ==========================================
 load_dotenv()
 app = FastAPI(title="Volty AI Backend - Ultimate Version")
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+logger = logging.getLogger("smart_trafo")
 
 # ==========================================
 # 2. KEAMANAN CORS
@@ -49,9 +52,9 @@ groq_client = None
 if GROQ_API_KEY:
     try:
         groq_client = Groq(api_key=GROQ_API_KEY)
-        print("✅ Groq Client Connected")
+        logger.info("Groq client connected")
     except Exception as e:
-        print(f"❌ Groq Error: {e}")
+        logger.error("Groq init failed: %s", e)
 
 # --- Init Supabase (Client Biasa) ---
 supabase: Optional[Client] = None
@@ -60,18 +63,18 @@ if SUPABASE_URL and SUPABASE_KEY:
     try:
         supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
         db_active = True
-        print("✅ Supabase Client Connected")
+        logger.info("Supabase client connected")
     except Exception as e:
-        print(f"❌ Supabase Client Error: {e}")
+        logger.error("Supabase client init failed: %s", e)
 
 # --- Init Supabase Admin (Service Role) ---
 supabase_admin: Optional[Client] = None
 if SUPABASE_URL and SUPABASE_SERVICE_KEY:
     try:
         supabase_admin = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
-        print("✅ Supabase Admin (Service Role) Connected")
+        logger.info("Supabase admin (service role) connected")
     except Exception as e:
-        print(f"❌ Supabase Admin Error: {e}")
+        logger.error("Supabase admin init failed: %s", e)
 # ==========================================
 # 4. INIT AGENT MD (SYSTEM PROMPT)
 # ==========================================
@@ -82,10 +85,10 @@ def load_agent_prompt():
         path = os.path.join(current_dir, "agent.md")
         with open(path, "r", encoding="utf-8") as f:
             prompt = f.read()
-            print("✅ Agent MD (System Prompt) Loaded")
+            logger.info("agent.md system prompt loaded")
             return prompt
     except Exception as e:
-        print(f"⚠️ Warning: agent.md tidak ditemukan! Menggunakan prompt darurat. Error: {e}")
+        logger.warning("agent.md not found, using fallback prompt: %s", e)
         return """Anda adalah VOLTY, Spesialis Senior Transformator PLN UPT Manado.
 BATASAN KETAT:
 1. HANYA jawab pertanyaan seputar Transformator dan Listrik Tegangan Tinggi.
@@ -97,20 +100,32 @@ VOLTY_BASE_PROMPT = load_agent_prompt()
 # ==========================================
 # 5. INIT MODEL ML
 # ==========================================
+# Urutan & nama fitur WAJIB sama persis dengan model.feature_names_in_ (lihat backend/Training.py).
+ML_FEATURE_ORDER = ["H2", "CH4", "C2H6", "C2H4", "C2H2"]
+
 model_trafo = None
 try:
     current_dir = os.path.dirname(os.path.abspath(__file__))
     model_path = os.path.join(current_dir, "smart_dga_model_keygas.pkl")
-    
+
     if not os.path.exists(model_path):
-        print(f"⚠️ Warning: File model tidak ditemukan di path: {model_path}")
+        logger.warning("Model file not found at %s", model_path)
     else:
         model_trafo = joblib.load(model_path)
-        print("✅ ML Model Loaded (via Joblib)")
-    
-except Exception as e: 
-    print(f"❌ ERROR LOADING MODEL: {str(e)}")
-    print("⚠️ System running without ML prediction.")
+        expected = getattr(model_trafo, "feature_names_in_", None)
+        if expected is not None and list(expected) != ML_FEATURE_ORDER:
+            logger.error(
+                "Loaded model expects features %s but backend is configured for %s. "
+                "Refusing to serve predictions with a mismatched schema.",
+                list(expected), ML_FEATURE_ORDER,
+            )
+            model_trafo = None
+        else:
+            logger.info("ML model loaded (features=%s)", ML_FEATURE_ORDER)
+
+except Exception as e:
+    logger.error("Error loading ML model: %s", e)
+    logger.warning("System running without ML prediction.")
 
 # ==========================================
 # 6. DATA MODELS
@@ -148,28 +163,21 @@ class TrafoBaruInput(BaseModel):
     serial_number: str
     tahun_pembuatan: str
     level_tegangan: str
-    user_email: str 
-
-class DeleteRequest(BaseModel):
-    user_email: str 
 
 class CreateUserRequest(BaseModel):
     email: str
     password: str
-    role: str       
-    unit_ultg: str  
-    requester_email: str
+    role: str
+    unit_ultg: str
 
 class MasterUltgInput(BaseModel):
     nama_ultg: str
-    requester_email: str
 
 class MasterGiInput(BaseModel):
     nama_gi: str
     nama_ultg: str
-    lat: float = 0.0 
-    lon: float = 0.0 
-    requester_email: str
+    lat: float = 0.0
+    lon: float = 0.0
 
 class UpdateGiInput(BaseModel):
     old_nama_gi: str
@@ -178,7 +186,6 @@ class UpdateGiInput(BaseModel):
     new_nama_ultg: str
     lat: float = 0.0
     lon: float = 0.0
-    requester_email: str
 
 class UpdateUserRequest(BaseModel):
     target_id: str
@@ -186,12 +193,10 @@ class UpdateUserRequest(BaseModel):
     new_role: str = ""  # Opsional
     new_unit_ultg: str = ""  # Opsional
     new_password: str = ""  # Opsional, jika kosong tidak diupdate
-    requester_email: str
 
 class UpdateUltgInput(BaseModel):
     old_nama_ultg: str
     new_nama_ultg: str
-    requester_email: str
 
 # ==========================================
 # 7. METODE ANALISIS TEKNIS
@@ -498,40 +503,83 @@ def analisis_key_gas(data: TrafoInput):
     return f"Dominan {dominant_gas}"
 
 # ==========================================
-# 8. ENDPOINTS (API ROUTES)
+# 8. AUTENTIKASI & OTORISASI
+# ==========================================
+# Semua endpoint yang mengubah data (admin/master/aset) memverifikasi identitas
+# pemanggil lewat token Supabase asli (Authorization: Bearer <access_token>),
+# BUKAN lewat field email yang dikirim client (dulu bisa dipalsukan begitu saja).
+
+def get_verified_email(authorization: Optional[str] = Header(None)) -> str:
+    """Ambil & verifikasi identitas pemanggil dari Supabase access token."""
+    if not authorization or not authorization.lower().startswith("bearer "):
+        raise HTTPException(status_code=401, detail="Header Authorization (Bearer token) wajib disertakan")
+
+    token = authorization.split(" ", 1)[1].strip()
+    if not supabase:
+        raise HTTPException(status_code=503, detail="Layanan autentikasi tidak tersedia")
+
+    try:
+        user_response = supabase.auth.get_user(token)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Token tidak valid atau kedaluwarsa")
+
+    user = getattr(user_response, "user", None)
+    email = getattr(user, "email", None) if user else None
+    if not email:
+        raise HTTPException(status_code=401, detail="Token tidak valid atau kedaluwarsa")
+    return email
+
+
+def require_super_admin(email: str) -> str:
+    """Pastikan email yang SUDAH TERVERIFIKASI token memiliki role super_admin."""
+    if not supabase_admin:
+        raise HTTPException(status_code=503, detail="DB Error")
+
+    # Pakai service-role client (bukan anon) karena request ini tidak membawa
+    # sesi user Supabase - kalau RLS aktif di tabel profiles, query lewat
+    # client anon akan selalu balik 0 baris dan mengunci semua super_admin.
+    check = supabase_admin.table("profiles").select("role").eq("email", email).execute()
+    rows = check.data
+    if not isinstance(rows, list) or len(rows) == 0:
+        raise HTTPException(status_code=403, detail="Unauthorized: User tidak ditemukan")
+
+    role = cast(Dict[str, Any], rows[0]).get("role")
+    if role != "super_admin":
+        raise HTTPException(status_code=403, detail="Unauthorized: Hanya Super Admin")
+    return email
+
+
+def require_super_admin_dep(email: str = Depends(get_verified_email)) -> str:
+    """Dependency: token valid DAN role super_admin."""
+    return require_super_admin(email)
+
+
+# ==========================================
+# 9. ENDPOINTS (API ROUTES)
 # ==========================================
 
 # --- 1. TAMBAH TRAFO (SUPER ADMIN) ---
 @app.post("/assets/add")
-def add_trafo(data: TrafoBaruInput):
-    if not supabase: 
+def add_trafo(data: TrafoBaruInput, requester_email: str = Depends(require_super_admin_dep)):
+    if not supabase:
         return {"error": "DB Error"}
-    
-    try:
-        user_check = supabase.table("profiles").select("role").eq("email", data.user_email).execute()
-        
-        current_role = "user"
-        if user_check.data and isinstance(user_check.data, list) and len(user_check.data) > 0:
-            user_data = cast(Dict[str, Any], user_check.data[0]) 
-            current_role = user_data.get("role", "user")
-             
-        if current_role != 'super_admin':
-            return {"status": "Gagal", "msg": "Akses Ditolak. Hanya Super Admin."}
 
+    try:
         # Insert Aset
-        payload = data.model_dump(exclude={"user_email"})
+        payload = data.model_dump()
         supabase.table("assets_trafo").insert(payload).execute()
-        
+
         # Insert Audit Log
         supabase.table("audit_logs").insert({
-            "user_email": data.user_email,
+            "user_email": requester_email,
             "action": "TAMBAH_TRAFO",
             "details": f"Menambahkan {data.nama_trafo} di {data.lokasi_gi}"
         }).execute()
-        
+
         return {"status": "Sukses", "msg": "Trafo berhasil didaftarkan"}
     except Exception as e:
-        return {"status": "Error", "msg": str(e)}
+        logger.error("add_trafo failed: %s", e)
+        return {"status": "Error", "msg": "Gagal menambahkan trafo"}
 
 
 @app.get("/api/keep-alive")
@@ -544,23 +592,23 @@ async def keep_alive():
         }
 
     try:
-        # Pylance sekarang tahu supabase pasti ada di sini
-        response = supabase.table('nama_tabel_anda').select("id").limit(1).execute()
-        
+        supabase.table('profiles').select("id").limit(1).execute()
+
         return {
             "status": "success",
-            "message": "Supabase is awake and running! ⚡",
+            "message": "Supabase is awake and running",
             "timestamp": "Ping berhasil dieksekusi."
         }
     except Exception as e:
+        logger.error("keep_alive ping failed: %s", e)
         return {
             "status": "error",
-            "message": f"Gagal membangunkan Supabase: {str(e)}"
+            "message": "Gagal membangunkan Supabase"
         }
 
 # --- 2. PREDICT / ANALISIS ---
 @app.post("/predict")
-def predict(data: TrafoInput):
+def predict(data: TrafoInput, _requester_email: str = Depends(get_verified_email)):
     # A. Jalankan Perhitungan Fisika/Kimia
     tdcg = hitung_tdcg(data)
     ieee_status, ieee_note = analisis_ieee_2019(data)
@@ -576,10 +624,13 @@ def predict(data: TrafoInput):
     ml_res = "ML Not Active"
     if model_trafo:
         try:
-            features = np.array([[data.h2, data.ch4, data.c2h2, data.c2h4, data.c2h6]])
+            features = pd.DataFrame(
+                [[data.h2, data.ch4, data.c2h6, data.c2h4, data.c2h2]],
+                columns=ML_FEATURE_ORDER,
+            )
             ml_res = model_trafo.predict(features)[0]
         except Exception as e:
-            print(f"ML Predict Error: {e}")
+            logger.error("ML predict error: %s", e)
             ml_res = "Error Prediction"
 
     # C. Analisis AI (LLM - Groq) menggunakan Agent MD
@@ -612,14 +663,7 @@ FORMAT OUTPUT (Markdown, TANPA emoji):
 """
         
         zona_p = str(pentagon_pct.get('zona', '-'))
-        h2_p = float(cast(float, pentagon_pct.get('h2',0)))
-        c2h6_p = float(cast(float, pentagon_pct.get('c2h6',0)))
-        ch4_p = float(cast(float, pentagon_pct.get('ch4',0)))
-        c2h4_p = float(cast(float, pentagon_pct.get('c2h4',0)))
-        c2h2_p = float(cast(float, pentagon_pct.get('c2h2',0)))
 
-        pentagon_gases = f"H2:{h2_p}%, C2H6:{c2h6_p}%, CH4:{ch4_p}%, C2H4:{c2h4_p}%, C2H2:{c2h2_p}%"
-        
         user_prompt = f"""DATA UJI DGA TRANSFORMATOR:
 | Gas | Nilai (ppm) |
 |-----|-------------|
@@ -648,7 +692,8 @@ INSTRUKSI: Susun laporan kesimpulan singkat dan rekomendasi."""
             )
             volty_chat = chat.choices[0].message.content
         except Exception as e:
-            volty_chat = f"Gagal memuat analisis AI: {str(e)}"
+            logger.error("Groq report generation failed: %s", e)
+            volty_chat = "Gagal memuat analisis AI. Silakan lihat hasil perhitungan teknis di atas."
 
     # D. Simpan ke Database (Riwayat Uji)
     if db_active and supabase and not data.skip_db_save:
@@ -678,7 +723,7 @@ INSTRUKSI: Susun laporan kesimpulan singkat dan rekomendasi."""
             }
             supabase.table("riwayat_uji").insert(riwayat_record).execute()
         except Exception as e:
-            print(f"Error saving to riwayat_uji: {e}")
+            logger.error("Failed to save riwayat_uji: %s", e)
 
     # E. Return Response
     return {
@@ -700,15 +745,15 @@ INSTRUKSI: Susun laporan kesimpulan singkat dan rekomendasi."""
 
 # --- 3. CHATBOT DENGAN AGENT MD ---
 @app.post("/chat")
-def chat_with_volty(data: ChatInput):
+def chat_with_volty(data: ChatInput, _requester_email: str = Depends(get_verified_email)):
     if not groq_client: return {"reply": "Maaf, koneksi AI sedang offline."}
-    
+
     # Gunakan identitas dan guardrails yang dibaca dari agent.md
     system_msg = VOLTY_BASE_PROMPT
-    
+
     if data.context:
         system_msg += f"\n\nKONTEKS DATA TRAFO:\n{data.context}"
-        
+
     try:
         chat = groq_client.chat.completions.create(
             messages=[
@@ -721,15 +766,18 @@ def chat_with_volty(data: ChatInput):
         )
         return {"reply": chat.choices[0].message.content}
     except Exception as e:
-        return {"reply": f"Error AI: {str(e)}"}
+        logger.error("Chat error: %s", e)
+        return {"reply": "Maaf, terjadi kendala saat memproses permintaan Anda."}
 
 # --- 4. HISTORY ---
 @app.get("/history")
 def get_history():
     if not db_active or not supabase: return []
-    try: 
+    try:
         return supabase.table("riwayat_uji").select("*").order("id", desc=True).limit(1000).execute().data
-    except: return []
+    except Exception as e:
+        logger.error("get_history failed: %s", e)
+        return []
 
 # --- 5. MANAGEMEN ASET ---
 @app.get("/assets")
@@ -739,27 +787,17 @@ def get_all_assets():
         response = supabase.table("assets_trafo").select("*").order("created_at", desc=True).execute()
         return response.data
     except Exception as e:
-        print(f"Error fetching assets: {e}")
+        logger.error("Error fetching assets: %s", e)
         return []
 
 @app.delete("/assets/delete/{asset_id}")
-def delete_asset(asset_id: int, user_email: str):
+def delete_asset(asset_id: int, requester_email: str = Depends(require_super_admin_dep)):
     if not db_active or not supabase: return {"status": "Error", "msg": "DB Offline"}
-    
-    try:
-        user_check = supabase.table("profiles").select("role").eq("email", user_email).execute()
-        
-        current_role = "user"
-        if user_check.data and isinstance(user_check.data, list) and len(user_check.data) > 0:
-            user_data = cast(Dict[str, Any], user_check.data[0])
-            current_role = user_data.get("role", "user")
-        
-        if current_role != 'super_admin':
-            return {"status": "Gagal", "msg": "Hanya Super Admin yang boleh menghapus aset master!"}
 
+    try:
         nama_aset = "Unknown Asset"
         asset_data = supabase.table("assets_trafo").select("*").eq("id", asset_id).execute()
-        
+
         if asset_data.data and isinstance(asset_data.data, list) and len(asset_data.data) > 0:
             first_asset = cast(Dict[str, Any], asset_data.data[0])
             nama_aset = f"{first_asset.get('nama_trafo', 'Unknown')} ({first_asset.get('lokasi_gi', 'Unknown')})"
@@ -767,7 +805,7 @@ def delete_asset(asset_id: int, user_email: str):
         supabase.table("assets_trafo").delete().eq("id", asset_id).execute()
 
         supabase.table("audit_logs").insert({
-            "user_email": user_email,
+            "user_email": requester_email,
             "action": "HAPUS_TRAFO",
             "details": f"Menghapus Master Aset: {nama_aset}"
         }).execute()
@@ -775,51 +813,32 @@ def delete_asset(asset_id: int, user_email: str):
         return {"status": "Sukses", "msg": f"Aset {nama_aset} berhasil dihapus permanen."}
 
     except Exception as e:
-        return {"status": "Error", "msg": str(e)}
+        logger.error("delete_asset failed: %s", e)
+        return {"status": "Error", "msg": "Gagal menghapus aset"}
 
 @app.delete("/history/{item_id}")
-def delete_history_item(item_id: int):
-    if db_active and supabase: 
+def delete_history_item(item_id: int, _requester_email: str = Depends(get_verified_email)):
+    if db_active and supabase:
         try:
             supabase.table("riwayat_uji").delete().eq("id", item_id).execute()
             return {"msg": "Data deleted"}
-        except Exception as e: 
-            return {"msg": f"Error deleting: {str(e)}"}
+        except Exception as e:
+            logger.error("delete_history_item failed: %s", e)
+            return {"msg": "Gagal menghapus data"}
     return {"msg": "DB not active"}
 
 # ==========================================
-# 8. MANAJEMEN USER (SUPER ADMIN ONLY)
+# 10. MANAJEMEN USER (SUPER ADMIN ONLY)
 # ==========================================
 
 @app.post("/admin/create-user")
-def admin_create_user(data: CreateUserRequest):
+def admin_create_user(data: CreateUserRequest, requester_email: str = Depends(require_super_admin_dep)):
     # 1. Pastikan Client Admin Tersedia
     admin_client = supabase_admin
-    if admin_client is None: 
+    if admin_client is None:
         return {"status": "Error", "msg": "Service Key not configured or Supabase offline"}
 
-    # Pastikan Client Public juga ada
-    public_client = supabase
-    if public_client is None:
-        return {"status": "Error", "msg": "Public Client offline"}
-
     try:
-        # 2. Cek apakah Requester adalah Super Admin
-        check = public_client.table("profiles")\
-            .select("role")\
-            .eq("email", data.requester_email)\
-            .execute()
-        
-        rows = check.data
-        if not isinstance(rows, list) or len(rows) == 0:
-            return {"status": "Gagal", "msg": "Unauthorized: User tidak ditemukan"}
-        
-        requester_profile = cast(Dict[str, Any], rows[0])
-        
-        user_role = requester_profile.get("role")
-        if user_role != 'super_admin':
-            return {"status": "Gagal", "msg": "Unauthorized: Hanya Super Admin"}
-
         # 3. Create User di Supabase Auth
         user_attributes = {
             "email": data.email,
@@ -850,7 +869,7 @@ def admin_create_user(data: CreateUserRequest):
 
         # 5. Audit Log
         admin_client.table("audit_logs").insert({
-            "user_email": data.requester_email,
+            "user_email": requester_email,
             "action": "CREATE_USER",
             "details": f"Membuat user baru: {data.email} ({data.unit_ultg})"
         }).execute()
@@ -858,39 +877,23 @@ def admin_create_user(data: CreateUserRequest):
         return {"status": "Sukses", "msg": f"User {data.email} berhasil dibuat!"}
 
     except Exception as e:
-        print(f"Error Create User: {str(e)}") 
-        return {"status": "Error", "msg": f"Gagal membuat user: {str(e)}"}
+        logger.error("admin_create_user failed: %s", e)
+        return {"status": "Error", "msg": "Gagal membuat user"}
 
 @app.delete("/admin/delete-user/{target_id}")
-def admin_delete_user(target_id: str, requester_email: str, unit_ultg: str = ""):
+def admin_delete_user(target_id: str, unit_ultg: str = "", requester_email: str = Depends(require_super_admin_dep)):
     admin_client = supabase_admin
-    if admin_client is None: 
+    if admin_client is None:
         return {"status": "Error", "msg": "Service Key Missing"}
-    
+
     public_client = supabase
     if public_client is None:
         return {"status": "Error", "msg": "Public DB Connection Error"}
-    
-    try:
-        # 2. Cek Super Admin
-        check = public_client.table("profiles")\
-            .select("role")\
-            .eq("email", requester_email)\
-            .execute()
-            
-        rows = check.data
-        if not isinstance(rows, list) or len(rows) == 0:
-            return {"status": "Gagal", "msg": "Unauthorized"}
-        
-        requester_profile = cast(Dict[str, Any], rows[0])
-            
-        if requester_profile.get("role") != 'super_admin':
-            return {"status": "Gagal", "msg": "Unauthorized: Bukan Super Admin"}
 
+    try:
         # 3. Hapus ULTG terkait (akan cascade delete semua GI, aset trafo, dan riwayat uji)
         ultg_deleted = False
         gi_deleted_count = 0
-        asset_deleted_count = 0
         if unit_ultg and unit_ultg.strip() and unit_ultg != "Kantor Induk":
             try:
                 # 3.1 Ambil semua GI di bawah ULTG ini
@@ -903,28 +906,24 @@ def admin_delete_user(target_id: str, requester_email: str, unit_ultg: str = "")
                     gi_list = [g.get('nama_gi') for g in gi_res.data] if gi_res.data else []
                     gi_deleted_count = len(gi_list)
                     
-                    # 3.3 Hapus semua aset trafo dan riwayat uji untuk setiap GI
-                    for gi_name in gi_list:
+                    # 3.3 Hapus semua aset trafo dan riwayat uji untuk seluruh GI sekaligus
+                    # (batch .in_() alih-alih loop per-GI supaya tidak N+1 round trip ke DB)
+                    if gi_list:
                         try:
-                            # Hapus assets_trafo
-                            admin_client.table("assets_trafo").delete().eq("lokasi_gi", gi_name).execute()
-                            print(f"✅ Deleted assets_trafo for GI: {gi_name}")
+                            admin_client.table("assets_trafo").delete().in_("lokasi_gi", gi_list).execute()
                         except Exception as e:
-                            print(f"⚠️ assets_trafo delete for {gi_name}: {e}")
-                        
+                            logger.warning("assets_trafo batch delete for %s failed: %s", gi_list, e)
+
                         try:
-                            # Hapus riwayat_uji
-                            admin_client.table("riwayat_uji").delete().eq("lokasi_gi", gi_name).execute()
-                            print(f"✅ Deleted riwayat_uji for GI: {gi_name}")
+                            admin_client.table("riwayat_uji").delete().in_("lokasi_gi", gi_list).execute()
                         except Exception as e:
-                            print(f"⚠️ riwayat_uji delete for {gi_name}: {e}")
-                
+                            logger.warning("riwayat_uji batch delete for %s failed: %s", gi_list, e)
+
                 # 3.4 Hapus ULTG (GI akan ikut terhapus jika ada foreign key cascade)
                 admin_client.table("master_ultg").delete().eq("nama_ultg", unit_ultg).execute()
                 ultg_deleted = True
-                print(f"✅ ULTG '{unit_ultg}' dan semua GI-nya berhasil dihapus")
             except Exception as ultg_err:
-                print(f"⚠️ Gagal hapus ULTG: {ultg_err}")
+                logger.warning("Gagal hapus ULTG: %s", ultg_err)
 
         # 4. Hapus dari Auth
         admin_client.auth.admin.delete_user(target_id)
@@ -932,8 +931,8 @@ def admin_delete_user(target_id: str, requester_email: str, unit_ultg: str = "")
         # 5. Hapus Profile Manual (Safe Execute)
         try:
             admin_client.table("profiles").delete().eq("id", target_id).execute()
-        except:
-            pass # Ignore jika sudah terhapus cascade
+        except Exception as e:
+            logger.warning("Profile delete for %s failed (mungkin sudah terhapus cascade): %s", target_id, e)
         
         # 6. Audit Log
         details = f"Menghapus User ID: {target_id}"
@@ -952,35 +951,21 @@ def admin_delete_user(target_id: str, requester_email: str, unit_ultg: str = "")
         
         return {"status": "Sukses", "msg": msg}
     except Exception as e:
-        return {"status": "Error", "msg": str(e)}
+        logger.error("admin_delete_user failed: %s", e)
+        return {"status": "Error", "msg": "Gagal menghapus user"}
 
 @app.put("/admin/update-user")
-def admin_update_user(data: UpdateUserRequest):
+def admin_update_user(data: UpdateUserRequest, requester_email: str = Depends(require_super_admin_dep)):
     """Update data user (email, role, unit_ultg, password) dengan cascade"""
     admin_client = supabase_admin
-    if admin_client is None: 
+    if admin_client is None:
         return {"status": "Error", "msg": "Service Key Missing"}
-    
+
     public_client = supabase
     if public_client is None:
         return {"status": "Error", "msg": "Public DB Connection Error"}
-    
-    try:
-        # 1. Cek Super Admin
-        check = public_client.table("profiles")\
-            .select("role")\
-            .eq("email", data.requester_email)\
-            .execute()
-            
-        rows = check.data
-        if not isinstance(rows, list) or len(rows) == 0:
-            return {"status": "Gagal", "msg": "Unauthorized"}
-        
-        requester_profile = cast(Dict[str, Any], rows[0])
-            
-        if requester_profile.get("role") != 'super_admin':
-            return {"status": "Gagal", "msg": "Unauthorized: Hanya Super Admin"}
 
+    try:
         # 2. Ambil data user lama untuk cascade
         old_user = public_client.table("profiles").select("email, unit_ultg").eq("id", data.target_id).execute()
         if not old_user.data or len(old_user.data) == 0:
@@ -1008,32 +993,28 @@ def admin_update_user(data: UpdateUserRequest):
             # Update master_ultg
             try:
                 admin_client.table("master_ultg").update({"nama_ultg": new_ultg_name}).eq("nama_ultg", old_unit_ultg).execute()
-                print(f"✅ Cascade: master_ultg nama updated from {old_unit_ultg} to {new_ultg_name}")
             except Exception as e:
-                print(f"⚠️ Cascade master_ultg: {e}")
-            
+                logger.warning("Cascade master_ultg failed: %s", e)
+
             # Update profiles.unit_ultg untuk semua user dengan ULTG lama (selain user yang sedang diedit)
             try:
                 admin_client.table("profiles").update({"unit_ultg": new_ultg_name}).eq("unit_ultg", old_unit_ultg).execute()
-                print(f"✅ Cascade: profiles.unit_ultg updated from {old_unit_ultg} to {new_ultg_name}")
             except Exception as e:
-                print(f"⚠️ Cascade profiles.unit_ultg: {e}")
+                logger.warning("Cascade profiles.unit_ultg failed: %s", e)
 
         # 4. Cascade: Jika email berubah, update referensi di tabel lain
         if data.new_email and data.new_email.strip() and old_email and data.new_email.strip() != old_email:
             # Update audit_logs
             try:
                 admin_client.table("audit_logs").update({"user_email": data.new_email.strip()}).eq("user_email", old_email).execute()
-                print(f"✅ Cascade: audit_logs user_email updated from {old_email} to {data.new_email}")
             except Exception as e:
-                print(f"⚠️ Cascade audit_logs: {e}")
-            
+                logger.warning("Cascade audit_logs failed: %s", e)
+
             # Update riwayat_uji jika ada kolom user_email
             try:
                 admin_client.table("riwayat_uji").update({"user_email": data.new_email.strip()}).eq("user_email", old_email).execute()
-                print(f"✅ Cascade: riwayat_uji user_email updated")
             except Exception as e:
-                print(f"⚠️ Cascade riwayat_uji (mungkin tidak ada kolom user_email): {e}")
+                logger.warning("Cascade riwayat_uji failed (mungkin tidak ada kolom user_email): %s", e)
 
         # 5. Update Auth jika ada perubahan email atau password
         auth_updates: Dict[str, Any] = {}
@@ -1057,18 +1038,18 @@ def admin_update_user(data: UpdateUserRequest):
             changes.append("password diubah")
         
         admin_client.table("audit_logs").insert({
-            "user_email": data.requester_email,
+            "user_email": requester_email,
             "action": "UPDATE_USER",
             "details": f"Update User ID: {data.target_id} - {', '.join(changes)}"
         }).execute()
 
         return {"status": "Sukses", "msg": "User berhasil diupdate!"}
     except Exception as e:
-        print(f"Error Update User: {str(e)}")
-        return {"status": "Error", "msg": str(e)}
-    
+        logger.error("admin_update_user failed: %s", e)
+        return {"status": "Error", "msg": "Gagal mengupdate user"}
+
 # ==========================================
-# 9. MASTER DATA (ULTG & GI)
+# 11. MASTER DATA (ULTG & GI)
 # ==========================================
 
 # --- A. GET HIERARCHY ---
@@ -1109,101 +1090,69 @@ def get_master_hierarchy():
             
         return mapping
     except Exception as e:
-        print(f"Error fetching hierarchy: {e}")
+        logger.error("Error fetching hierarchy: %s", e)
         return {}
 
 # --- B. ADD ULTG ---
 @app.post("/admin/master/add-ultg")
-def add_master_ultg(data: MasterUltgInput):
+def add_master_ultg(data: MasterUltgInput, requester_email: str = Depends(require_super_admin_dep)):
     admin_client = supabase_admin
     if admin_client is None: return {"status": "Error", "msg": "Admin access required"}
-    
-    public_client = supabase
-    if public_client is None: return {"status": "Error", "msg": "DB Error"}
 
     try:
-        # Validasi Super Admin
-        check = public_client.table("profiles").select("role").eq("email", data.requester_email).execute()
-        
-        rows = check.data
-        if not isinstance(rows, list) or len(rows) == 0:
-            return {"status": "Gagal", "msg": "Unauthorized"}
-        
-        user_data = cast(Dict[str, Any], rows[0])
-        if user_data.get('role') != 'super_admin':
-            return {"status": "Gagal", "msg": "Unauthorized"}
-
         admin_client.table("master_ultg").insert({"nama_ultg": data.nama_ultg}).execute()
         return {"status": "Sukses", "msg": f"ULTG {data.nama_ultg} berhasil ditambahkan"}
     except Exception as e:
-        return {"status": "Error", "msg": str(e)}
+        logger.error("add_master_ultg failed: %s", e)
+        return {"status": "Error", "msg": "Gagal menambahkan ULTG"}
 
 # --- C. DELETE ULTG ---
 @app.delete("/admin/master/delete-ultg/{nama_ultg}")
-def delete_master_ultg(nama_ultg: str, requester_email: str):
+def delete_master_ultg(nama_ultg: str, requester_email: str = Depends(require_super_admin_dep)):
     admin_client = supabase_admin
     if admin_client is None: return {"status": "Error", "msg": "Admin access required"}
-    
+
     public_client = supabase
     if public_client is None: return {"status": "Error", "msg": "DB Error"}
 
     try:
-        check = public_client.table("profiles").select("role").eq("email", requester_email).execute()
-        
-        rows = check.data
-        if not isinstance(rows, list) or len(rows) == 0:
-            return {"status": "Gagal", "msg": "Unauthorized"}
-            
-        user_data = cast(Dict[str, Any], rows[0])
-        if user_data.get('role') != 'super_admin':
-            return {"status": "Gagal", "msg": "Unauthorized"}
-
         # 1. Dapatkan semua GI di bawah ULTG ini
         ultg_res = public_client.table("master_ultg").select("id").eq("nama_ultg", nama_ultg).execute()
         if ultg_res.data and isinstance(ultg_res.data, list) and len(ultg_res.data) > 0:
             ultg_row = cast(Dict[str, Any], ultg_res.data[0])
             ultg_id = ultg_row.get('id')
-            
+
             gi_res = public_client.table("master_gi").select("nama_gi").eq("id_ultg", ultg_id).execute()
             gi_rows = gi_res.data if isinstance(gi_res.data, list) else []
             gi_list = [cast(Dict[str, Any], g)['nama_gi'] for g in gi_rows if isinstance(g, dict)]
-            
-            # 2. Hapus semua aset trafo dan riwayat uji terkait GI-GI tersebut
-            for gi_name in gi_list:
+
+            # 2. Hapus semua aset trafo dan riwayat uji terkait GI-GI tersebut sekaligus
+            # (batch .in_() alih-alih loop per-GI supaya tidak N+1 round trip ke DB)
+            if gi_list:
                 try:
-                    admin_client.table("assets_trafo").delete().eq("lokasi_gi", gi_name).execute()
-                    admin_client.table("riwayat_uji").delete().eq("lokasi_gi", gi_name).execute()
+                    admin_client.table("assets_trafo").delete().in_("lokasi_gi", gi_list).execute()
+                    admin_client.table("riwayat_uji").delete().in_("lokasi_gi", gi_list).execute()
                 except Exception as del_err:
-                    print(f"Warning: Gagal hapus aset/riwayat untuk GI {gi_name}: {del_err}")
-        
+                    logger.warning("Gagal hapus aset/riwayat untuk GI %s: %s", gi_list, del_err)
+
         # 3. Hapus ULTG (GI akan ikut terhapus jika ada foreign key cascade)
         admin_client.table("master_ultg").delete().eq("nama_ultg", nama_ultg).execute()
         return {"status": "Sukses", "msg": f"ULTG {nama_ultg} beserta semua GI dan aset terkait berhasil dihapus."}
     except Exception as e:
-        return {"status": "Error", "msg": str(e)}
+        logger.error("delete_master_ultg failed: %s", e)
+        return {"status": "Error", "msg": "Gagal menghapus ULTG"}
 
 # --- C2. UPDATE ULTG ---
 @app.put("/admin/master/update-ultg")
-def update_master_ultg(data: UpdateUltgInput):
+def update_master_ultg(data: UpdateUltgInput, requester_email: str = Depends(require_super_admin_dep)):
     """Update nama ULTG dengan cascade ke profiles dan tabel terkait"""
     admin_client = supabase_admin
     if admin_client is None: return {"status": "Error", "msg": "Admin access required"}
-    
+
     public_client = supabase
     if public_client is None: return {"status": "Error", "msg": "DB Error"}
 
     try:
-        # 1. Cek Super Admin
-        check = public_client.table("profiles").select("role").eq("email", data.requester_email).execute()
-        
-        rows = check.data
-        if not isinstance(rows, list) or len(rows) == 0:
-            return {"status": "Gagal", "msg": "Unauthorized"}
-            
-        user_data = cast(Dict[str, Any], rows[0])
-        if user_data.get('role') != 'super_admin':
-            return {"status": "Gagal", "msg": "Unauthorized: Hanya Super Admin"}
-
         # 2. Cek apakah ULTG lama ada
         ultg_check = public_client.table("master_ultg").select("id").eq("nama_ultg", data.old_nama_ultg).execute()
         if not ultg_check.data or len(ultg_check.data) == 0:
@@ -1217,46 +1166,35 @@ def update_master_ultg(data: UpdateUltgInput):
 
         # 4. Update nama ULTG di master_ultg
         admin_client.table("master_ultg").update({"nama_ultg": data.new_nama_ultg}).eq("nama_ultg", data.old_nama_ultg).execute()
-        print(f"✅ ULTG name updated: {data.old_nama_ultg} -> {data.new_nama_ultg}")
 
         # 5. Cascade: Update profiles.unit_ultg untuk semua user dengan ULTG lama
         try:
             admin_client.table("profiles").update({"unit_ultg": data.new_nama_ultg}).eq("unit_ultg", data.old_nama_ultg).execute()
-            print(f"✅ Cascade: profiles.unit_ultg updated from {data.old_nama_ultg} to {data.new_nama_ultg}")
         except Exception as e:
-            print(f"⚠️ Cascade profiles: {e}")
+            logger.warning("Cascade profiles failed: %s", e)
 
         # 6. Audit Log
         admin_client.table("audit_logs").insert({
-            "user_email": data.requester_email,
+            "user_email": requester_email,
             "action": "UPDATE_ULTG",
             "details": f"Rename ULTG: {data.old_nama_ultg} -> {data.new_nama_ultg}"
         }).execute()
 
         return {"status": "Sukses", "msg": f"ULTG berhasil diubah dari '{data.old_nama_ultg}' menjadi '{data.new_nama_ultg}'"}
     except Exception as e:
-        print(f"Error Update ULTG: {str(e)}")
-        return {"status": "Error", "msg": str(e)}
+        logger.error("update_master_ultg failed: %s", e)
+        return {"status": "Error", "msg": "Gagal mengupdate ULTG"}
 
 # --- D. ADD GI ---
 @app.post("/admin/master/add-gi")
-def add_master_gi(data: MasterGiInput):
+def add_master_gi(data: MasterGiInput, _requester_email: str = Depends(require_super_admin_dep)):
     admin_client = supabase_admin
     if admin_client is None: return {"status": "Error", "msg": "Admin access required"}
-    
+
     public_client = supabase
     if public_client is None: return {"status": "Error", "msg": "DB Error"}
 
     try:
-        check = public_client.table("profiles").select("role").eq("email", data.requester_email).execute()
-        rows = check.data
-        if not isinstance(rows, list) or len(rows) == 0:
-            return {"status": "Gagal", "msg": "Unauthorized"}
-        
-        user_data = cast(Dict[str, Any], rows[0])
-        if user_data.get('role') != 'super_admin':
-            return {"status": "Gagal", "msg": "Unauthorized"}
-
         # Cari ID ULTG
         ultg_res = public_client.table("master_ultg").select("id").eq("nama_ultg", data.nama_ultg).execute()
         
@@ -1278,28 +1216,19 @@ def add_master_gi(data: MasterGiInput):
         
         return {"status": "Sukses", "msg": f"{data.nama_gi} ditambahkan"}
     except Exception as e:
-        return {"status": "Error", "msg": str(e)}
+        logger.error("add_master_gi failed: %s", e)
+        return {"status": "Error", "msg": "Gagal menambahkan GI"}
 
 # --- E. UPDATE GI ---
 @app.put("/admin/master/update-gi")
-def update_master_gi(data: UpdateGiInput):
+def update_master_gi(data: UpdateGiInput, _requester_email: str = Depends(require_super_admin_dep)):
     admin_client = supabase_admin
     if admin_client is None: return {"status": "Error", "msg": "Admin access required"}
-    
+
     public_client = supabase
     if public_client is None: return {"status": "Error", "msg": "DB Error"}
 
     try:
-        # Validasi user adalah super_admin
-        check = public_client.table("profiles").select("role").eq("email", data.requester_email).execute()
-        rows = check.data
-        if not isinstance(rows, list) or len(rows) == 0:
-            return {"status": "Gagal", "msg": "Unauthorized"}
-        
-        user_data = cast(Dict[str, Any], rows[0])
-        if user_data.get('role') != 'super_admin':
-            return {"status": "Gagal", "msg": "Unauthorized"}
-
         # Cari ID ULTG lama
         old_ultg_res = public_client.table("master_ultg").select("id").eq("nama_ultg", data.old_nama_ultg).execute()
         old_ultg_rows = old_ultg_res.data
@@ -1333,42 +1262,35 @@ def update_master_gi(data: UpdateGiInput):
                     "lokasi_gi": data.new_nama_gi
                 }).eq("lokasi_gi", data.old_nama_gi).execute()
             except Exception as asset_err:
-                print(f"Warning: Gagal update aset untuk GI {data.old_nama_gi}: {asset_err}")
-            
+                logger.warning("Gagal update aset untuk GI %s: %s", data.old_nama_gi, asset_err)
+
             # Update lokasi_gi di riwayat_uji jika nama berubah
             try:
                 admin_client.table("riwayat_uji").update({
                     "lokasi_gi": data.new_nama_gi
                 }).eq("lokasi_gi", data.old_nama_gi).execute()
             except Exception as riwayat_err:
-                print(f"Warning: Gagal update riwayat untuk GI {data.old_nama_gi}: {riwayat_err}")
-        
+                logger.warning("Gagal update riwayat untuk GI %s: %s", data.old_nama_gi, riwayat_err)
+
         return {"status": "Sukses", "msg": f"GI berhasil diupdate ke {data.new_nama_gi}"}
     except Exception as e:
-        return {"status": "Error", "msg": str(e)}
+        logger.error("update_master_gi failed: %s", e)
+        return {"status": "Error", "msg": "Gagal mengupdate GI"}
 
 # --- F. DELETE GI ---
 @app.delete("/admin/master/delete-gi")
-def delete_master_gi(nama_gi: str, nama_ultg: str, requester_email: str):
+def delete_master_gi(nama_gi: str, nama_ultg: str, _requester_email: str = Depends(require_super_admin_dep)):
     admin_client = supabase_admin
     if admin_client is None: return {"status": "Error", "msg": "Admin access required"}
-    
+
     public_client = supabase
     if public_client is None: return {"status": "Error", "msg": "DB Error"}
 
     try:
-        check = public_client.table("profiles").select("role").eq("email", requester_email).execute()
-        rows = check.data
-        if not isinstance(rows, list) or len(rows) == 0: return {"status": "Gagal", "msg": "Unauthorized"}
-        
-        user_data = cast(Dict[str, Any], rows[0])
-        if user_data.get('role') != 'super_admin':
-            return {"status": "Gagal", "msg": "Unauthorized"}
-
         ultg_res = public_client.table("master_ultg").select("id").eq("nama_ultg", nama_ultg).execute()
         ultg_rows = ultg_res.data
         if not isinstance(ultg_rows, list) or len(ultg_rows) == 0: return {"status": "Gagal", "msg": "ULTG 404"}
-        
+
         ultg_row = cast(Dict[str, Any], ultg_rows[0])
         ultg_id = ultg_row.get('id')
 
@@ -1376,16 +1298,17 @@ def delete_master_gi(nama_gi: str, nama_ultg: str, requester_email: str):
         try:
             admin_client.table("assets_trafo").delete().eq("lokasi_gi", nama_gi).execute()
         except Exception as asset_err:
-            print(f"Warning: Gagal hapus aset untuk GI {nama_gi}: {asset_err}")
-        
+            logger.warning("Gagal hapus aset untuk GI %s: %s", nama_gi, asset_err)
+
         # 2. Hapus semua riwayat uji terkait GI ini
         try:
             admin_client.table("riwayat_uji").delete().eq("lokasi_gi", nama_gi).execute()
         except Exception as riwayat_err:
-            print(f"Warning: Gagal hapus riwayat untuk GI {nama_gi}: {riwayat_err}")
-        
+            logger.warning("Gagal hapus riwayat untuk GI %s: %s", nama_gi, riwayat_err)
+
         # 3. Hapus GI
         admin_client.table("master_gi").delete().match({"nama_gi": nama_gi, "id_ultg": ultg_id}).execute()
         return {"status": "Sukses", "msg": f"GI {nama_gi} beserta semua aset dan riwayat terkait berhasil dihapus"}
     except Exception as e:
-        return {"status": "Error", "msg": str(e)}
+        logger.error("delete_master_gi failed: %s", e)
+        return {"status": "Error", "msg": "Gagal menghapus GI"}

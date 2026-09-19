@@ -127,7 +127,7 @@ export default function SuperAdminPage() {
     level_tegangan: "",
   });
 
-  // 🔥 FUNGSI UTAMA LOAD DATA
+  // FUNGSI UTAMA LOAD DATA
   const loadInitialData = async () => {
     setIsFetching(true);
     try {
@@ -340,7 +340,7 @@ export default function SuperAdminPage() {
         {/* HEADER */}
         <div className="text-center text-white">
           <div className="inline-flex items-center justify-center gap-2 mb-2 bg-white/20 backdrop-blur-md px-5 py-1.5 rounded-full border border-white/30 shadow-lg">
-            <Zap size={18} className="text-[#FFD700] fill-[#FFD700]" />
+            <Zap size={18} className="text-[#F1C40F] fill-[#F1C40F]" />
             <span className="text-xs font-bold tracking-widest text-white uppercase">
               Super Admin Control
             </span>
@@ -358,7 +358,7 @@ export default function SuperAdminPage() {
             className={`px-8 py-5 border-b flex items-center gap-3 ${isDarkMode ? "bg-slate-800 border-slate-700" : "bg-white border-gray-100"}`}
           >
             <div
-              className={`p-2.5 rounded-xl ${isDarkMode ? "bg-[#1B7A8F]/20 text-[#1B7A8F]" : "bg-[#E1F5FE] text-[#0277BD]"}`}
+              className={`p-2.5 rounded-xl ${isDarkMode ? "bg-[#146C94]/20 text-[#146C94]" : "bg-[#E1F5FE] text-[#0277BD]"}`}
             >
               <FileText size={24} />
             </div>
@@ -437,7 +437,7 @@ export default function SuperAdminPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-5">
                 <h4
-                  className={`text-sm font-bold border-b-2 border-[#FFD700] pb-2 inline-flex items-center gap-2 ${isDarkMode ? "text-white" : "text-gray-800"}`}
+                  className={`text-sm font-bold border-b-2 border-[#F1C40F] pb-2 inline-flex items-center gap-2 ${isDarkMode ? "text-white" : "text-gray-800"}`}
                 >
                   <Tag size={18} className="text-[#F9A825]" /> 2. Identitas Unit
                 </h4>
@@ -581,7 +581,7 @@ export default function SuperAdminPage() {
             </div>
           </div>
 
-          <div className="max-h-[500px] overflow-y-auto">
+          <div className="max-h-[500px] overflow-y-auto overflow-x-auto">
             {isFetching && assetList.length === 0 ? (
               <div className="p-12 text-center flex flex-col items-center opacity-50 gap-4">
                 <Loader2 className="animate-spin text-blue-500" size={40} />
@@ -728,7 +728,7 @@ export default function SuperAdminPage() {
 
       {/* MODAL DELETE */}
       {showDeleteModal && assetToDelete && (
-        <div className="fixed inset-0 z-99] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-[99] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div
             className={`rounded-2xl shadow-2xl max-w-md w-full overflow-hidden ${isDarkMode ? "bg-slate-800" : "bg-white"}`}
           >
@@ -761,8 +761,8 @@ export default function SuperAdminPage() {
               <div
                 className={`border rounded-xl p-4 mb-4 ${isDarkMode ? "bg-red-900/20 border-red-800" : "bg-red-50 border-red-200"}`}
               >
-                <p className="text-xs text-red-500 font-medium mb-2">
-                  ⚠️ Ketik <span className="font-bold">HAPUS</span>:
+                <p className="text-xs text-red-500 font-medium mb-2 flex items-center gap-1.5">
+                  <AlertCircle size={14} /> Ketik <span className="font-bold">HAPUS</span>:
                 </p>
                 <input
                   type="text"
@@ -802,7 +802,7 @@ export default function SuperAdminPage() {
 
       {/* MODAL EDIT */}
       {showEditModal && editFormData && (
-        <div className="fixed inset-0 z-99] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-[99] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div
             className={`rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden max-h-[90vh] flex flex-col ${isDarkMode ? "bg-slate-800" : "bg-white"}`}
           >

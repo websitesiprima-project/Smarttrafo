@@ -7,12 +7,12 @@ describe("LoadingScreen Component (White Box)", () => {
   it("renders the component properly", () => {
     render(<LoadingScreen />);
 
-    // Check for the main text "PLN SMART" -> The word "PLN" and "SMART" are split in DOM
-    const plnText = screen.getByText(/PLN/i);
+    // Check for the main text "SMARTTRAFO" -> The word "SMART" and "TRAFO" are split in DOM
     const smartText = screen.getByText(/SMART/i);
+    const trafoText = screen.getByText(/TRAFO/i);
 
-    expect(plnText).toBeInTheDocument();
     expect(smartText).toBeInTheDocument();
+    expect(trafoText).toBeInTheDocument();
 
     // Check for the loading text
     const loadingMessage = screen.getByText("Memuat Sistem...");

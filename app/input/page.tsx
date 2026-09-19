@@ -11,7 +11,7 @@ import {
   Info,
 } from "lucide-react";
 import DuvalPentagon from "@/components/DuvalPentagon";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase, authHeaders } from "@/lib/supabaseClient";
 
 // --- FUNGSI PEMBERSIH TEKS (Utility) ---
 const cleanMarkdown = (text: string) => {
@@ -141,7 +141,8 @@ export default function InputFormPage() {
       });
       if (!isAllowed && Object.keys(unitMapping).length > 0) {
         return toast.error(
-          `⛔ Akses Ditolak: GI "${formData.lokasi_gi}" bukan bagian dari ULTG ${userUnit}.`,
+          `Akses Ditolak: GI "${formData.lokasi_gi}" bukan bagian dari ULTG ${userUnit}.`,
+          { icon: <AlertTriangle size={18} className="text-red-500" /> },
         );
       }
     }
@@ -151,7 +152,10 @@ export default function InputFormPage() {
       const payload = { ...formData, skip_db_save: true };
       const res = await fetch(`${API_URL}/predict`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...authHeaders(session),
+        },
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error("Gagal terhubung ke AI Service");
@@ -280,8 +284,8 @@ export default function InputFormPage() {
       ? "bg-slate-900/80 backdrop-blur-xl border-slate-800 shadow-2xl"
       : "bg-white/80 backdrop-blur-xl border-slate-200/60 shadow-xl",
     input: isDarkMode
-      ? "bg-slate-800/50 border-slate-700/50 text-slate-100 focus:border-[#1B7A8F] focus:ring-1 focus:ring-[#1B7A8F]"
-      : "bg-slate-50 border-slate-300 text-slate-900 focus:border-[#1B7A8F] focus:ring-1 focus:ring-[#1B7A8F]",
+      ? "bg-slate-800/50 border-slate-700/50 text-slate-100 focus:border-[#146C94] focus:ring-1 focus:ring-[#146C94]"
+      : "bg-slate-50 border-slate-300 text-slate-900 focus:border-[#146C94] focus:ring-1 focus:ring-[#146C94]",
     readOnly: isDarkMode
       ? "bg-slate-800/20 text-slate-500 border-transparent shadow-inner"
       : "bg-slate-100 text-slate-500 border-transparent shadow-inner",
@@ -333,7 +337,7 @@ export default function InputFormPage() {
           <div className={`lg:col-span-7 rounded-2xl p-6 border ${theme.card}`}>
             <div className="mb-8">
               <div className="flex items-center gap-2 mb-4 pb-2 border-b border-dashed border-gray-500/30">
-                <FileText className="text-[#1B7A8F]" size={18} />
+                <FileText className="text-[#146C94]" size={18} />
                 <h3 className={`font-bold text-base uppercase ${theme.text}`}>
                   Identitas Aset
                 </h3>
@@ -466,7 +470,7 @@ export default function InputFormPage() {
                   (gas) => (
                     <div key={gas} className="relative group">
                       <label
-                        className={`absolute left-3 top-[-10px] px-1 text-xs font-bold uppercase tracking-wider bg-transparent backdrop-blur-sm ${isDarkMode ? "text-slate-400 group-focus-within:text-[#1B7A8F]" : "text-slate-500 group-focus-within:text-[#1B7A8F]"} z-10 transition-colors`}
+                        className={`absolute left-3 top-[-10px] px-1 text-xs font-bold uppercase tracking-wider bg-transparent backdrop-blur-sm ${isDarkMode ? "text-slate-400 group-focus-within:text-[#146C94]" : "text-slate-500 group-focus-within:text-[#146C94]"} z-10 transition-colors`}
                       >
                         {gas}
                       </label>
@@ -476,7 +480,7 @@ export default function InputFormPage() {
                         name={gas}
                         value={formData[gas] === 0 ? "" : formData[gas]}
                         onChange={handleChange}
-                        className={`w-full px-4 py-3.5 rounded-xl border font-mono text-base font-semibold outline-none transition-all duration-300 ${isDarkMode ? "bg-slate-800/50 border-slate-700/50 text-slate-100 focus:border-[#1B7A8F] focus:ring-1 focus:ring-[#1B7A8F] focus:bg-slate-800" : "bg-white border-slate-300 text-slate-800 focus:border-[#1B7A8F] focus:ring-1 focus:ring-[#1B7A8F] shadow-sm"}`}
+                        className={`w-full px-4 py-3.5 rounded-xl border font-mono text-base font-semibold outline-none transition-all duration-300 ${isDarkMode ? "bg-slate-800/50 border-slate-700/50 text-slate-100 focus:border-[#146C94] focus:ring-1 focus:ring-[#146C94] focus:bg-slate-800" : "bg-white border-slate-300 text-slate-800 focus:border-[#146C94] focus:ring-1 focus:ring-[#146C94] shadow-sm"}`}
                         placeholder="0.0"
                       />
                       <span
@@ -492,7 +496,7 @@ export default function InputFormPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full relative overflow-hidden py-4 bg-linear-to-r from-[#1B7A8F] to-[#155d6d] hover:to-[#1B7A8F] text-white rounded-xl font-bold text-lg shadow-xl shadow-[#1B7A8F]/20 flex items-center justify-center gap-3 transition-all duration-300 transform hover:-translate-y-1 active:scale-[0.98]"
+              className="w-full relative overflow-hidden py-4 bg-linear-to-r from-[#146C94] to-[#0F5678] hover:to-[#146C94] text-white rounded-xl font-bold text-lg shadow-xl shadow-[#146C94]/20 flex items-center justify-center gap-3 transition-all duration-300 transform hover:-translate-y-1 active:scale-[0.98]"
             >
               <div className="absolute inset-0 w-full h-full bg-white/10 -translate-x-full hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
               {isLoading ? (

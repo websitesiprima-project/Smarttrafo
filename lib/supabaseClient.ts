@@ -20,3 +20,14 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
     detectSessionInUrl: true,
   },
 });
+
+// Header Authorization untuk request ke backend FastAPI, dibaca dari session
+// Supabase yang sedang aktif. Backend memverifikasi token ini sendiri lewat
+// supabase.auth.get_user() -- bukan sekadar percaya email yang dikirim client.
+export function authHeaders(
+  session: { access_token?: string } | null | undefined,
+): Record<string, string> {
+  return session?.access_token
+    ? { Authorization: `Bearer ${session.access_token}` }
+    : {};
+}

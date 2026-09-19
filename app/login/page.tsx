@@ -48,7 +48,7 @@ const LoginPage = () => {
       if (error) throw error;
 
       toast.success("Login Berhasil! Mengalihkan...", {
-        icon: "⚡",
+        icon: <Zap size={18} className="text-white" fill="currentColor" />,
         style: {
           background: "#10b981",
           color: "#fff",
@@ -69,21 +69,21 @@ const LoginPage = () => {
 
       {/* LOADING OVERLAY FULLSCREEN */}
       {loading && (
-        <div className="fixed inset-0 z-100] flex flex-col items-center justify-center bg-[#0f172a]/90 backdrop-blur-xl transition-all duration-500">
+        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#0f172a]/90 backdrop-blur-xl transition-all duration-500">
           <div className="relative">
-            <div className="absolute inset-0 bg-[#FFD700] blur-2xl opacity-20 rounded-full animate-pulse"></div>
-            <div className="w-24 h-24 bg-linear-to-br from-[#1e293b] to-[#0f172a] rounded-3xl flex items-center justify-center shadow-2xl border border-[#1B7A8F]/30 relative z-10">
+            <div className="absolute inset-0 bg-[#F1C40F] blur-2xl opacity-20 rounded-full animate-pulse"></div>
+            <div className="w-24 h-24 bg-linear-to-br from-[#1e293b] to-[#0f172a] rounded-3xl flex items-center justify-center shadow-2xl border border-[#146C94]/30 relative z-10">
               <Zap
-                className="text-[#FFD700] animate-bounce"
+                className="text-[#F1C40F] animate-bounce"
                 size={48}
                 fill="currentColor"
               />
             </div>
           </div>
           <h3 className="text-2xl font-bold text-white mt-8 tracking-wider">
-            PLN SMART
+            SMARTTRAFO
           </h3>
-          <p className="text-[#1B7A8F] text-sm font-medium animate-pulse mt-2">
+          <p className="text-[#146C94] text-sm font-medium animate-pulse mt-2">
             Memverifikasi Kredensial...
           </p>
         </div>
@@ -99,7 +99,7 @@ const LoginPage = () => {
 
         {/* --- LEFT SECTION (IMAGE & BRANDING) --- */}
         <div
-          className={`hidden lg:flex w-1/2 relative transition-all duration-1000 ease-out ${isDarkMode ? "bg-gray-900" : "bg-linear-to-br from-[#1B7A8F] to-[#155d6d]"} ${mounted ? "translate-x-0 opacity-100" : "-translate-x-10 opacity-0"}`}
+          className={`hidden lg:flex w-1/2 relative transition-all duration-1000 ease-out ${isDarkMode ? "bg-gray-900" : "bg-linear-to-br from-[#146C94] to-[#0F5678]"} ${mounted ? "translate-x-0 opacity-100" : "-translate-x-10 opacity-0"}`}
         >
           {/* Background Image with Overlay */}
           <div className="absolute inset-0 z-0">
@@ -109,7 +109,7 @@ const LoginPage = () => {
               className={`w-full h-full object-cover mix-blend-overlay ${isDarkMode ? "opacity-40" : "opacity-20"}`}
             />
             <div
-              className={`absolute inset-0 ${isDarkMode ? "bg-linear-to-t from-[#0f172a] via-[#0f172a]/80 to-transparent" : "bg-linear-to-t from-[#1B7A8F] via-[#1B7A8F]/60 to-transparent"}`}
+              className={`absolute inset-0 ${isDarkMode ? "bg-linear-to-t from-[#0f172a] via-[#0f172a]/80 to-transparent" : "bg-linear-to-t from-[#146C94] via-[#146C94]/60 to-transparent"}`}
             ></div>
           </div>
 
@@ -129,14 +129,14 @@ const LoginPage = () => {
 
             <div className="space-y-6">
               <div
-                className={`inline-flex items-center gap-2 px-3 py-1 rounded-full backdrop-blur-sm text-xs font-bold uppercase tracking-wider ${isDarkMode ? "bg-[#1B7A8F]/20 border border-[#1B7A8F]/30 text-[#4fd1c5]" : "bg-white/30 border border-white/50 text-white"}`}
+                className={`inline-flex items-center gap-2 px-3 py-1 rounded-full backdrop-blur-sm text-xs font-bold uppercase tracking-wider ${isDarkMode ? "bg-[#146C94]/20 border border-[#146C94]/30 text-[#5FC1E8]" : "bg-white/30 border border-white/50 text-white"}`}
               >
                 <Activity size={14} /> Sistem Monitoring Real-time
               </div>
               <h1 className="text-5xl font-extrabold text-white leading-tight">
                 Smart Asset <br />
                 <span
-                  className={`text-transparent bg-clip-text ${isDarkMode ? "bg-linear-to-r from-[#FFD700] to-[#f59e0b]" : "bg-linear-to-r from-white to-slate-100"}`}
+                  className={`text-transparent bg-clip-text ${isDarkMode ? "bg-linear-to-r from-[#F1C40F] to-[#f59e0b]" : "bg-linear-to-r from-white to-slate-100"}`}
                 >
                   Management
                 </span>
@@ -162,8 +162,8 @@ const LoginPage = () => {
           className={`w-full lg:w-1/2 flex items-center justify-center p-6 relative ${isDarkMode ? "" : "bg-white"}`}
         >
           {/* Background Decoration */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-[#1B7A8F] rounded-full blur-[120px] opacity-10 pointer-events-none"></div>
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#FFD700] rounded-full blur-[100px] opacity-5 pointer-events-none"></div>
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[#146C94] rounded-full blur-[120px] opacity-10 pointer-events-none"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#F1C40F] rounded-full blur-[100px] opacity-5 pointer-events-none"></div>
 
           <div
             className={`w-full max-w-md transition-all duration-1000 delay-300 ease-out ${mounted ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
@@ -184,7 +184,7 @@ const LoginPage = () => {
                   className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg border mb-4 ${isDarkMode ? "bg-[#1e293b] border-slate-700" : "bg-[#1e293b] border-blue-200"}`}
                 >
                   <Zap
-                    className="text-[#FFD700]"
+                    className="text-[#F1C40F]"
                     size={32}
                     fill="currentColor"
                   />
@@ -192,7 +192,7 @@ const LoginPage = () => {
                 <h2
                   className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-slate-800"}`}
                 >
-                  PLN SMART
+                  SMARTTRAFO
                 </h2>
               </div>
 
@@ -212,14 +212,14 @@ const LoginPage = () => {
               <form onSubmit={handleLogin} className="space-y-6 mt-8">
                 <div className="space-y-2 group">
                   <label
-                    className={`text-xs font-semibold uppercase tracking-wider ml-1 transition-colors ${isDarkMode ? "text-slate-400 group-focus-within:text-[#1B7A8F]" : "text-slate-700 group-focus-within:text-[#1B7A8F]"}`}
+                    className={`text-xs font-semibold uppercase tracking-wider ml-1 transition-colors ${isDarkMode ? "text-slate-400 group-focus-within:text-[#146C94]" : "text-slate-700 group-focus-within:text-[#146C94]"}`}
                   >
                     Email Korporat
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                       <Mail
-                        className={`h-5 w-5 transition-colors ${isDarkMode ? "text-slate-500 group-focus-within:text-[#1B7A8F]" : "text-slate-400 group-focus-within:text-[#1B7A8F]"}`}
+                        className={`h-5 w-5 transition-colors ${isDarkMode ? "text-slate-500 group-focus-within:text-[#146C94]" : "text-slate-400 group-focus-within:text-[#146C94]"}`}
                       />
                     </div>
                     <input
@@ -228,7 +228,7 @@ const LoginPage = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className={`block w-full pl-11 pr-4 py-3.5 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-[#1B7A8F]/50 focus:border-[#1B7A8F] shadow-sm ${isDarkMode ? "bg-slate-900/50 border-2 border-blue-400 text-slate-100 placeholder-slate-500" : "bg-white border-2 border-[#1B7A8F] text-slate-900 placeholder-slate-400"}`}
+                      className={`block w-full pl-11 pr-4 py-3.5 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-[#146C94]/50 focus:border-[#146C94] shadow-sm ${isDarkMode ? "bg-slate-900/50 border-2 border-blue-400 text-slate-100 placeholder-slate-500" : "bg-white border-2 border-[#146C94] text-slate-900 placeholder-slate-400"}`}
                       placeholder="nama@pln.co.id"
                     />
                   </div>
@@ -236,14 +236,14 @@ const LoginPage = () => {
 
                 <div className="space-y-2 group">
                   <label
-                    className={`text-xs font-semibold uppercase tracking-wider ml-1 transition-colors ${isDarkMode ? "text-slate-400 group-focus-within:text-[#FFD700]" : "text-slate-700 group-focus-within:text-[#FFD700]"}`}
+                    className={`text-xs font-semibold uppercase tracking-wider ml-1 transition-colors ${isDarkMode ? "text-slate-400 group-focus-within:text-[#F1C40F]" : "text-slate-700 group-focus-within:text-[#F1C40F]"}`}
                   >
                     Password
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                       <Lock
-                        className={`h-5 w-5 transition-colors ${isDarkMode ? "text-slate-500 group-focus-within:text-[#FFD700]" : "text-slate-400 group-focus-within:text-[#FFD700]"}`}
+                        className={`h-5 w-5 transition-colors ${isDarkMode ? "text-slate-500 group-focus-within:text-[#F1C40F]" : "text-slate-400 group-focus-within:text-[#F1C40F]"}`}
                       />
                     </div>
                     <input
@@ -252,7 +252,7 @@ const LoginPage = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className={`block w-full pl-11 pr-4 py-3.5 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-[#FFD700]/50 focus:border-[#FFD700] shadow-sm ${isDarkMode ? "bg-slate-900/50 border-2 border-cyan-400 text-slate-100 placeholder-slate-500" : "bg-white border-2 border-[#1B7A8F] text-slate-900 placeholder-slate-400"}`}
+                      className={`block w-full pl-11 pr-4 py-3.5 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-[#F1C40F]/50 focus:border-[#F1C40F] shadow-sm ${isDarkMode ? "bg-slate-900/50 border-2 border-cyan-400 text-slate-100 placeholder-slate-500" : "bg-white border-2 border-[#146C94] text-slate-900 placeholder-slate-400"}`}
                       placeholder="••••••••"
                     />
                   </div>
@@ -260,9 +260,9 @@ const LoginPage = () => {
 
                 <button
                   type="submit"
-                  data-testid="login-button" // 🔥 Added for Testing
+                  data-testid="login-button" // Added for Testing
                   disabled={loading}
-                  className="w-full relative group overflow-hidden bg-linear-to-r from-[#1B7A8F] to-[#155d6d] hover:to-[#1B7A8F] text-white font-bold py-4 rounded-xl shadow-lg shadow-[#1B7A8F]/20 transition-all active:scale-[0.98]"
+                  className="w-full relative group overflow-hidden bg-linear-to-r from-[#146C94] to-[#0F5678] hover:to-[#146C94] text-white font-bold py-4 rounded-xl shadow-lg shadow-[#146C94]/20 transition-all active:scale-[0.98]"
                 >
                   <div className="absolute inset-0 w-full h-full bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
                   <div className="flex items-center justify-center gap-2">
@@ -293,7 +293,7 @@ const LoginPage = () => {
                     onClick={() =>
                       toast("Silakan hubungi Admin ULTG di Extension 123")
                     }
-                    className={`font-bold transition-colors hover:underline ${isDarkMode ? "text-[#1B7A8F] hover:text-[#FFD700]" : "text-[#1B7A8F] hover:text-[#16697a]"}`}
+                    className={`font-bold transition-colors hover:underline ${isDarkMode ? "text-[#146C94] hover:text-[#F1C40F]" : "text-[#146C94] hover:text-[#16697a]"}`}
                   >
                     Hubungi SuperAdmin (UPT MANADO)
                   </button>

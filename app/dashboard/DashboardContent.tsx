@@ -548,7 +548,7 @@ export default function DashboardPage() {
           </MapContainer>
 
           <div
-            className={`absolute bottom-4 left-4 z-1000] p-4 rounded-xl shadow-lg border ${isDarkMode ? "bg-slate-800/95 border-slate-600" : "bg-white/95 border-slate-200"}`}
+            className={`absolute bottom-4 left-4 z-[1000] p-4 rounded-xl shadow-lg border ${isDarkMode ? "bg-slate-800/95 border-slate-600" : "bg-white/95 border-slate-200"}`}
           >
             <h4
               className={`text-xs font-bold uppercase mb-3 flex items-center gap-2 ${textMain}`}
@@ -625,7 +625,7 @@ export default function DashboardPage() {
             className={`flex-[1.5] rounded-2xl border shadow-sm p-0 flex flex-col overflow-hidden ${isDarkMode ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"}`}
           >
             <div
-              className={`p-4 border-b shadow-sm bg-[#1B7A8F] text-white ${isDarkMode ? "border-slate-600" : "border-gray-100"}`}
+              className={`p-4 border-b shadow-sm bg-[#146C94] text-white ${isDarkMode ? "border-slate-600" : "border-gray-100"}`}
             >
               <h3 className="font-bold text-sm flex items-center gap-2">
                 <Trophy className="text-[#F1C40F]" size={18} fill="#F1C40F" />{" "}
@@ -658,13 +658,13 @@ export default function DashboardPage() {
                         <div>
                           <div className="flex items-center gap-2">
                             <span
-                              className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider ${isDarkMode ? "bg-[#1B7A8F]/20 text-[#4FC3F7]" : "bg-[#1B7A8F]/10 text-[#1B7A8F]"}`}
+                              className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider ${isDarkMode ? "bg-[#146C94]/20 text-[#4FC3F7]" : "bg-[#146C94]/10 text-[#146C94]"}`}
                             >
                               {item.gi}
                             </span>
                           </div>
                           <p
-                            className={`font-bold text-sm mt-0.5 transition-colors ${isDarkMode ? "text-white group-hover:text-[#4FC3F7]" : "text-gray-900 group-hover:text-[#1B7A8F]"}`}
+                            className={`font-bold text-sm mt-0.5 transition-colors ${isDarkMode ? "text-white group-hover:text-[#4FC3F7]" : "text-gray-900 group-hover:text-[#146C94]"}`}
                           >
                             {item.unit}
                           </p>
@@ -672,7 +672,7 @@ export default function DashboardPage() {
                       </div>
                       <div className="text-right">
                         <p
-                          className={`font-black text-lg flex items-center justify-end gap-1 ${isDarkMode ? "text-[#4FC3F7]" : "text-[#1B7A8F]"}`}
+                          className={`font-black text-lg flex items-center justify-end gap-1 ${isDarkMode ? "text-[#4FC3F7]" : "text-[#146C94]"}`}
                         >
                           <Flame
                             size={16}
@@ -714,7 +714,7 @@ export default function DashboardPage() {
 
       {/* MODAL CHART DETAIL */}
       {selectedTrafo && (
-        <div className="fixed top-0 left-0 w-screen h-screen z-9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div className="fixed top-0 left-0 w-screen h-screen z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div
             className={`w-full max-w-5xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] ${isDarkMode ? "bg-slate-800" : "bg-white"}`}
           >

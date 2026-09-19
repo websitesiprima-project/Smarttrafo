@@ -80,7 +80,7 @@ const VoltyMascot = ({
           width="60"
           height="50"
           rx="12"
-          fill="#FFD700"
+          fill="#F1C40F"
           stroke="#b45309"
           strokeWidth="3"
         />
@@ -143,7 +143,7 @@ const VoltyMascot = ({
           width="12"
           height="25"
           rx="6"
-          fill="#1B7A8F"
+          fill="#146C94"
           animate={{ rotate: [0, -15, 0], y: [0, -2, 0] }}
           transition={{ repeat: Infinity, duration: 2 }}
         />
@@ -153,7 +153,7 @@ const VoltyMascot = ({
           width="12"
           height="25"
           rx="6"
-          fill="#1B7A8F"
+          fill="#146C94"
           animate={{ rotate: [0, 15, 0], y: [0, -2, 0] }}
           transition={{ repeat: Infinity, duration: 2, delay: 1 }}
         />

@@ -1,8 +1,8 @@
 <div align="center">
-  <img src="public/assets/Logo_SMART.jpg" alt="Logo SMART TRAFO" width="120" />
-  
-  # ⚡ PLN SMART TRAFO
-  **Sistem Manajemen Aset & Analisis DGA Terintegrasi**
+  <img src="public/assets/Logo_SMART.jpg" alt="Logo SMARTTRAFO" width="120" />
+
+  # SMARTTRAFO
+  **Sistem Manajemen Aset & Analisis DGA Terintegrasi — PLN UPT Manado**
 
   <p align="center">
     <img src="https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" />

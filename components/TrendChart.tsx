@@ -11,6 +11,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { TrendingUp } from "lucide-react";
 
 // ============================================================================
 // INTERFACES (KAMUS TYPE SCRIPT)
@@ -52,8 +53,8 @@ const TrendChart = ({ data, isDarkMode }: TrendChartProps) => {
           : "bg-white border-slate-200"
       }`}
     >
-      <h3 className="text-sm font-bold uppercase mb-4 text-[#1B7A8F] tracking-widest">
-        📈 Tren Kenaikan Gas (Gassing Rate)
+      <h3 className="text-sm font-bold uppercase mb-4 text-[#146C94] tracking-widest flex items-center gap-2">
+        <TrendingUp size={16} /> Tren Kenaikan Gas (Gassing Rate)
       </h3>
 
       <div className="h-[300px] w-full text-xs">

@@ -16,7 +16,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 export async function GET() {
   try {
     // Melakukan query super ringan.
-    // PENTING: Ganti 'users' dengan nama tabel asli di database PLN SMART Anda.
+    // PENTING: Ganti 'users' dengan nama tabel asli di database SMARTTRAFO Anda.
     const { data, error } = await supabase.from("users").select("id").limit(1);
 
     // Jika terjadi error dari sisi database (misal tabel tidak ditemukan)
@@ -28,7 +28,7 @@ export async function GET() {
     return NextResponse.json(
       {
         status: "success",
-        message: "Supabase PLN SMART is awake! ⚡",
+        message: "Supabase SMARTTRAFO is awake",
         timestamp: new Date().toISOString(),
         data: data,
       },

@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Send, MessageCircle } from "lucide-react";
+import { X, Send, MessageCircle, Lightbulb } from "lucide-react";
 import VoltyMascot from "./VoltyMascot";
 import { useAppContext } from "@/app/AppContext";
+import { authHeaders } from "@/lib/supabaseClient";
 
 // ============================================================================
 // INTERFACES (KAMUS TYPE SCRIPT)
@@ -85,7 +86,7 @@ const cleanMarkdown = (text: string) => {
 };
 
 const VoltyAssistant = ({ activeField, onClose }: VoltyAssistantProps) => {
-  const { API_URL } = useAppContext();
+  const { API_URL, session } = useAppContext();
   const [mode, setMode] = useState<"hidden" | "info" | "chat">("hidden");
   const [chatInput, setChatInput] = useState("");
   // Inisialisasi State dengan tipe ChatEntry[]
@@ -142,7 +143,10 @@ const VoltyAssistant = ({ activeField, onClose }: VoltyAssistantProps) => {
     try {
       const res = await fetch(`${API_URL}/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...authHeaders(session),
+        },
         body: JSON.stringify({ message: userMsg }),
       });
       const data = await res.json();
@@ -156,7 +160,7 @@ const VoltyAssistant = ({ activeField, onClose }: VoltyAssistantProps) => {
     } catch (error) {
       const errorChat: ChatEntry = {
         user: userMsg,
-        ai: "Maaf, koneksi ke otak saya terputus (Backend Offline). 😢",
+        ai: "Maaf, koneksi ke otak saya terputus (Backend Offline).",
         timestamp: new Date().toISOString(),
       };
       setChatHistory((prev) => [...prev, errorChat]);
@@ -190,7 +194,7 @@ const VoltyAssistant = ({ activeField, onClose }: VoltyAssistantProps) => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => setMode("chat")}
-            className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 lg:bottom-8 lg:right-8 bg-[#1B7A8F] text-white p-3 sm:p-4 rounded-full shadow-2xl z-40 hover:bg-[#156b7d] transition-colors flex items-center justify-center border-2 sm:border-4 border-white pointer-events-auto"
+            className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 lg:bottom-8 lg:right-8 bg-[#146C94] text-white p-3 sm:p-4 rounded-full shadow-2xl z-40 hover:bg-[#0F5678] transition-colors flex items-center justify-center border-2 sm:border-4 border-white pointer-events-auto"
           >
             <MessageCircle size={24} className="sm:w-7 sm:h-7" />
             <span className="absolute -top-1 -right-1 flex h-3 w-3">
@@ -214,7 +218,12 @@ const VoltyAssistant = ({ activeField, onClose }: VoltyAssistantProps) => {
             >
               <div className="flex justify-between items-start mb-2 border-b border-slate-100 dark:border-slate-700 pb-2">
                 <h4 className="font-bold text-[10px] sm:text-xs uppercase tracking-wide flex items-center gap-1 sm:gap-2 text-slate-500 dark:text-slate-400">
-                  💡 {title}
+                  {mode === "chat" ? (
+                    <MessageCircle size={12} className="sm:w-3.5 sm:h-3.5" />
+                  ) : (
+                    <Lightbulb size={12} className="sm:w-3.5 sm:h-3.5" />
+                  )}{" "}
+                  {title}
                 </h4>
                 <button
                   onClick={() => {
@@ -241,7 +250,7 @@ const VoltyAssistant = ({ activeField, onClose }: VoltyAssistantProps) => {
                     chatHistory.map((chat, idx) => (
                       <div key={idx} className="space-y-2">
                         <div className="flex justify-end">
-                          <div className="bg-[#1B7A8F] text-white text-[10px] sm:text-xs p-1.5 sm:p-2 rounded-lg rounded-tr-none max-w-[85%] shadow-sm">
+                          <div className="bg-[#146C94] text-white text-[10px] sm:text-xs p-1.5 sm:p-2 rounded-lg rounded-tr-none max-w-[85%] shadow-sm">
                             {chat.user}
                           </div>
                         </div>
@@ -271,12 +280,12 @@ const VoltyAssistant = ({ activeField, onClose }: VoltyAssistantProps) => {
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
                     placeholder="Tanya Volty..."
-                    className="w-full bg-slate-100 dark:bg-slate-900 text-[10px] sm:text-xs p-2 sm:p-3 pr-8 sm:pr-10 rounded-lg outline-none focus:ring-1 focus:ring-[#1B7A8F] text-slate-800 dark:text-white"
+                    className="w-full bg-slate-100 dark:bg-slate-900 text-[10px] sm:text-xs p-2 sm:p-3 pr-8 sm:pr-10 rounded-lg outline-none focus:ring-1 focus:ring-[#146C94] text-slate-800 dark:text-white"
                   />
                   <button
                     type="submit"
                     disabled={!chatInput.trim()}
-                    className="absolute right-1.5 sm:right-2 top-1.5 sm:top-2 p-1 text-[#1B7A8F] hover:text-[#156b7d] disabled:opacity-30 transition-colors"
+                    className="absolute right-1.5 sm:right-2 top-1.5 sm:top-2 p-1 text-[#146C94] hover:text-[#0F5678] disabled:opacity-30 transition-colors"
                   >
                     <Send size={14} className="sm:w-4 sm:h-4" />
                   </button>

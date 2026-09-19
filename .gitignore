@@ -39,3 +39,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# python / backend
+backend/__pycache__/
+backend/*.pyc
+backend/.coverage
+backend/.pytest_cache/
+
+# Model training byproducts (regenerable via backend/Training.py). NOTE:
+# backend/smart_dga_model_keygas.pkl itself is NOT ignored -- Vercel deploys
+# main.py's directory as-is with no separate training step, so the model
+# file the app actually loads at runtime must stay committed.
+backend/DATASET_GABUNGAN_DGA_5GAS.csv
+backend/HASIL_*.csv

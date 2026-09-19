@@ -14,6 +14,7 @@ import {
   Edit3,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { authHeaders } from "@/lib/supabaseClient";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -92,13 +93,15 @@ export default function UnitManagementPage() {
     try {
       const res = await fetch(`${API_URL}/admin/master/add-gi`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...authHeaders(session),
+        },
         body: JSON.stringify({
           nama_gi: newGi.name,
           nama_ultg: newGi.ultg,
           lat: parseFloat(newGi.lat) || 0,
           lon: parseFloat(newGi.lon) || 0,
-          requester_email: session?.user?.email,
         }),
       });
 
@@ -125,8 +128,8 @@ export default function UnitManagementPage() {
     const toastId = toast.loading("Menghapus Unit dan semua data terkait...");
     try {
       const res = await fetch(
-        `${API_URL}/admin/master/delete-ultg/${nama}?requester_email=${session?.user?.email}`,
-        { method: "DELETE" },
+        `${API_URL}/admin/master/delete-ultg/${nama}`,
+        { method: "DELETE", headers: authHeaders(session) },
       );
       const data = await res.json();
       if (data.status !== "Sukses") throw new Error(data.msg);
@@ -151,8 +154,8 @@ export default function UnitManagementPage() {
     const toastId = toast.loading("Menghapus GI dan data terkait...");
     try {
       const res = await fetch(
-        `${API_URL}/admin/master/delete-gi?nama_gi=${gi}&nama_ultg=${ultg}&requester_email=${session?.user?.email}`,
-        { method: "DELETE" },
+        `${API_URL}/admin/master/delete-gi?nama_gi=${gi}&nama_ultg=${ultg}`,
+        { method: "DELETE", headers: authHeaders(session) },
       );
       const data = await res.json();
       if (data.status === "Sukses") {
@@ -194,7 +197,10 @@ export default function UnitManagementPage() {
     try {
       const res = await fetch(`${API_URL}/admin/master/update-gi`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...authHeaders(session),
+        },
         body: JSON.stringify({
           old_nama_gi: oldGi,
           old_nama_ultg: oldUltg,
@@ -202,7 +208,6 @@ export default function UnitManagementPage() {
           new_nama_ultg: newUltg,
           lat: parseFloat(lat) || 0,
           lon: parseFloat(lon) || 0,
-          requester_email: session?.user?.email,
         }),
       });
 
@@ -255,11 +260,13 @@ export default function UnitManagementPage() {
     try {
       const res = await fetch(`${API_URL}/admin/master/update-ultg`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...authHeaders(session),
+        },
         body: JSON.stringify({
           old_nama_ultg: oldName,
           new_nama_ultg: newName.trim(),
-          requester_email: session?.user?.email,
         }),
       });
 
@@ -285,7 +292,7 @@ export default function UnitManagementPage() {
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Building2 className="text-[#1B7A8F]" /> Manajemen Aset & Peta
+            <Building2 className="text-[#146C94]" /> Manajemen Aset & Peta
           </h1>
           <p className="text-sm opacity-60">
             Kelola lokasi fisik Gardu Induk (GI) dan koordinat peta.
@@ -326,7 +333,7 @@ export default function UnitManagementPage() {
             className={`p-6 rounded-2xl border shadow-sm ${isDarkMode ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"}`}
           >
             <h3 className="font-bold mb-4 flex items-center gap-2">
-              <MapPin size={18} className="text-[#1B7A8F]" /> Tambah Lokasi GI
+              <MapPin size={18} className="text-[#146C94]" /> Tambah Lokasi GI
             </h3>
             <form onSubmit={handleAddGi} className="space-y-4">
               <div>
@@ -392,7 +399,7 @@ export default function UnitManagementPage() {
 
               <button
                 type="submit"
-                className="w-full bg-[#1B7A8F] text-white py-3 rounded-xl font-bold hover:bg-[#155e6e] shadow-lg transition"
+                className="w-full bg-[#146C94] text-white py-3 rounded-xl font-bold hover:bg-[#0F5678] shadow-lg transition"
               >
                 Simpan Lokasi
               </button>
@@ -419,8 +426,8 @@ export default function UnitManagementPage() {
               key={ultg}
               className={`rounded-xl border overflow-hidden ${isDarkMode ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"}`}
             >
-              <div className="p-4 bg-[#1B7A8F]/10 flex justify-between items-center border-b border-gray-500/10 group">
-                <h4 className="font-bold text-lg text-[#1B7A8F] flex items-center gap-2">
+              <div className="p-4 bg-[#146C94]/10 flex justify-between items-center border-b border-gray-500/10 group">
+                <h4 className="font-bold text-lg text-[#146C94] flex items-center gap-2">
                   <Map size={18} /> {`ULTG ${ultg}`}
                 </h4>
                 <button
@@ -446,7 +453,7 @@ export default function UnitManagementPage() {
                       >
                         <div className="flex flex-col">
                           <span className="text-sm font-medium flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-[#FFD700]"></div>
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#F1C40F]"></div>
                             {gi.name}
                           </span>
                           {Number(gi.lat) !== 0 || Number(gi.lon) !== 0 ? (
@@ -487,7 +494,7 @@ export default function UnitManagementPage() {
 
       {/* Modal Delete GI */}
       {deleteGiModal.show && (
-        <div className="fixed inset-0 z-9999] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
             onClick={() =>
@@ -522,7 +529,7 @@ export default function UnitManagementPage() {
                 <div className="flex items-start gap-3 mb-3">
                   <MapPin
                     size={18}
-                    className="text-[#1B7A8F] mt-0.5 shrink-0"
+                    className="text-[#146C94] mt-0.5 shrink-0"
                   />
                   <div>
                     <p
@@ -592,7 +599,7 @@ export default function UnitManagementPage() {
 
       {/* Modal Edit GI */}
       {editGiModal.show && (
-        <div className="fixed inset-0 z-9999] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
             onClick={() =>
@@ -727,7 +734,7 @@ export default function UnitManagementPage() {
               </button>
               <button
                 onClick={confirmEditGi}
-                className="flex-1 px-4 py-3 rounded-xl font-medium text-white bg-linear-to-r from-[#1B7A8F] to-[#155e6e] hover:from-[#155e6e] hover:to-[#0f4a57] transition-all duration-200 shadow-lg shadow-[#1B7A8F]/30 hover:shadow-[#1B7A8F]/50"
+                className="flex-1 px-4 py-3 rounded-xl font-medium text-white bg-linear-to-r from-[#146C94] to-[#0F5678] hover:from-[#0F5678] hover:to-[#0f4a57] transition-all duration-200 shadow-lg shadow-[#146C94]/30 hover:shadow-[#146C94]/50"
               >
                 Simpan Perubahan
               </button>
@@ -738,7 +745,7 @@ export default function UnitManagementPage() {
 
       {/* Modal Edit ULTG */}
       {editUltgModal.show && (
-        <div className="fixed inset-0 z-9999] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
             onClick={() =>
@@ -820,7 +827,7 @@ export default function UnitManagementPage() {
                   !editUltgModal.newName.trim() ||
                   editUltgModal.oldName === editUltgModal.newName.trim()
                 }
-                className={`flex-1 px-4 py-3 rounded-xl font-medium text-white transition-all duration-200 ${!editUltgModal.newName.trim() || editUltgModal.oldName === editUltgModal.newName.trim() ? "bg-gray-400 cursor-not-allowed" : "bg-linear-to-r from-[#1B7A8F] to-[#155e6e] hover:from-[#155e6e] hover:to-[#0f4a57] shadow-lg shadow-[#1B7A8F]/30 hover:shadow-[#1B7A8F]/50"}`}
+                className={`flex-1 px-4 py-3 rounded-xl font-medium text-white transition-all duration-200 ${!editUltgModal.newName.trim() || editUltgModal.oldName === editUltgModal.newName.trim() ? "bg-gray-400 cursor-not-allowed" : "bg-linear-to-r from-[#146C94] to-[#0F5678] hover:from-[#0F5678] hover:to-[#0f4a57] shadow-lg shadow-[#146C94]/30 hover:shadow-[#146C94]/50"}`}
               >
                 Simpan Perubahan
               </button>

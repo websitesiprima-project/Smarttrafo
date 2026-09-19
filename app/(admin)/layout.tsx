@@ -48,7 +48,7 @@ export default function AdminLayout({
   if (isAuthorized === null) {
     return (
       <div className="min-h-[80vh] flex flex-col items-center justify-center gap-4 text-slate-500">
-        <Loader2 className="animate-spin text-[#1B7A8F]" size={40} />
+        <Loader2 className="animate-spin text-[#146C94]" size={40} />
         <p className="font-bold animate-pulse">
           Memverifikasi Hak Akses Admin...
         </p>

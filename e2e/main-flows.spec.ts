@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Black Box Testing - PLN SMART Trafo", () => {
+test.describe("Black Box Testing - SMARTTRAFO", () => {
   // Test 1: Verifikasi Landing Page dimuat dengan benar (Black Box UI Check)
   test("Landing Page loads correctly and contains key elements", async ({
     page,

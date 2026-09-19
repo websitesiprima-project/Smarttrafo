@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { computeDuvalPentagonCentroid } from "@/utils/pdf/calculations";
 
 // ============================================================================
 // INTERFACE (KAMUS TYPE SCRIPT)
@@ -30,33 +31,19 @@ const DuvalPentagon = ({ h2, ch4, c2h6, c2h4, c2h2 }: DuvalPentagonProps) => {
       </div>
     );
 
-  // Perhitungan Persentase
-  const pH2 = (vH2 / total) * 100;
-  const pC2H6 = (vC2H6 / total) * 100;
-  const pCH4 = (vCH4 / total) * 100;
-  const pC2H4 = (vC2H4 / total) * 100;
-  const pC2H2 = (vC2H2 / total) * 100;
-
   // Fungsi konversi derajat ke radian dengan tipe data number
   const rad = (deg: number) => (deg * Math.PI) / 180;
 
-  // Titik Sumbu Gas (Scale approx 0.4 relative to 100%)
-  const k = 0.4;
-  const points = [
-    { x: 0, y: pH2 * k }, // H2 (Top)
-    { x: pC2H6 * k * Math.cos(rad(162)), y: pC2H6 * k * Math.sin(rad(162)) }, // C2H6
-    { x: pCH4 * k * Math.cos(rad(234)), y: pCH4 * k * Math.sin(rad(234)) }, // CH4
-    { x: pC2H4 * k * Math.cos(rad(306)), y: pC2H4 * k * Math.sin(rad(306)) }, // C2H4
-    { x: pC2H2 * k * Math.cos(rad(18)), y: pC2H2 * k * Math.sin(rad(18)) }, // C2H2
-  ];
-
-  // Hitung Centroid Sederhana (Average Position)
-  let Cx = 0;
-  let Cy = 0;
-  points.forEach((p) => {
-    Cx += p.x;
-    Cy += p.y;
+  // Titik sumbu gas & centroid - rumus sama dengan detectDuvalZone/drawDuvalPentagon
+  const centroid = computeDuvalPentagonCentroid({
+    h2: vH2,
+    ch4: vCH4,
+    c2h6: vC2H6,
+    c2h4: vC2H4,
+    c2h2: vC2H2,
   });
+  const Cx = centroid?.Cx ?? 0;
+  const Cy = centroid?.Cy ?? 0;
 
   // SVG Paths untuk Zona Duval Pentagon 1 (Approximation Coordinates)
   const zones = {

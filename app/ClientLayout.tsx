@@ -28,7 +28,7 @@ const MenuButton = ({ icon, label, active, onClick, isDarkMode }: any) => (
     onClick={onClick}
     className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 font-medium ${
       active
-        ? "bg-[#1B7A8F] text-white shadow-lg translate-x-1"
+        ? "bg-[#146C94] text-white shadow-lg translate-x-1"
         : `hover:bg-gray-500/5 ${isDarkMode ? "text-gray-300 hover:text-white" : "text-gray-600 hover:text-gray-900"}`
     }`}
   >
@@ -153,15 +153,15 @@ export default function ClientLayout({
       {isLoggingOut && (
         <div className="fixed inset-0 z-100 flex flex-col items-center justify-center bg-white/95 backdrop-blur-sm transition-all duration-300 transform-gpu">
           <div className="relative">
-            <div className="absolute inset-0 bg-[#FFD700] blur-2xl opacity-10 rounded-full animate-pulse transform-gpu"></div>
+            <div className="absolute inset-0 bg-[#F1C40F] blur-2xl opacity-10 rounded-full animate-pulse transform-gpu"></div>
             <div className="w-40 h-40 relative z-10 drop-shadow-md transform-gpu">
               <VoltyMascot mood="happy" isSpeaking={false} isJumping={true} />
             </div>
           </div>
           <h3 className="text-2xl font-bold text-slate-800 mt-8 tracking-wider">
-            PLN SMART
+            SMARTTRAFO
           </h3>
-          <p className="text-[#1B7A8F] text-sm font-medium animate-pulse mt-2">
+          <p className="text-[#146C94] text-sm font-medium animate-pulse mt-2">
             Sedang keluar sistem...
           </p>
         </div>
@@ -183,9 +183,9 @@ export default function ClientLayout({
                 <Menu size={26} />
               </button>
               <div className="flex items-center gap-2">
-                <Zap className="text-[#1B7A8F]" size={20} fill="#1B7A8F" />
+                <Zap className="text-[#146C94]" size={20} fill="#146C94" />
                 <h1 className="text-lg font-bold tracking-tight">
-                  PLN <span className="text-[#F1C40F]">SMART</span>
+                  SMART<span className="text-[#F1C40F]">TRAFO</span>
                 </h1>
               </div>
             </div>
@@ -195,7 +195,7 @@ export default function ClientLayout({
               >
                 {session?.user?.email || "Memuat..."}
               </p>
-              <p className="text-[10px] font-bold text-[#1B7A8F] uppercase tracking-wider">
+              <p className="text-[10px] font-bold text-[#146C94] uppercase tracking-wider">
                 {userRole === "super_admin" ? "SUPER ADMIN" : userUnit}
               </p>
             </div>
@@ -211,9 +211,9 @@ export default function ClientLayout({
           >
             <div className="h-20 flex items-center justify-between px-6 border-b border-gray-500/10">
               <h1
-                className={`font-bold text-xl ${isDarkMode ? "text-white" : "text-[#1B7A8F]"}`}
+                className={`font-bold text-xl ${isDarkMode ? "text-white" : "text-[#146C94]"}`}
               >
-                PLN <span className="text-[#F1C40F]">SMART</span>
+                SMART<span className="text-[#F1C40F]">TRAFO</span>
               </h1>
               <button onClick={() => setIsSidebarOpen(false)}>
                 <X size={20} />
